@@ -7,7 +7,12 @@
     v-model="activeItem"
     color="primary"
   >
-    <v-btn value="top" :to="{ path: '/'}">
+    <v-btn value="home" :to="{ path: '/'}">
+      <span>Home</span>
+      <v-icon>home</v-icon>
+    </v-btn>
+
+    <v-btn value="top" :to="{ name: 'top-stories'}">
       <span>Top Stories</span>
       <v-icon>thumb_up</v-icon>
     </v-btn>
@@ -30,7 +35,7 @@ import { Component, Vue } from 'vue-property-decorator';
 
 @Component
 export default class BottomNav extends Vue {
-  activeItem = 'top';
+  activeItem = 'home';
 }
 </script>
 

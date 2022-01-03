@@ -5,6 +5,7 @@ import store from '../store';
 import TopStories from '../views/TopStories.vue';
 import CodeExamples from '../views/CodeExamples.vue';
 import MyFavorites from '../views/MyFavorites.vue';
+import Home from '../views/Home.vue';
 
 Vue.use(Router);
 
@@ -22,6 +23,12 @@ const router = new Router({
   routes: [
     {
       path: '/',
+      name: 'home',
+      component: Home,
+      meta: new RouteMeta({ title: 'Home' })
+    },
+    {
+      path: '/top-stories',
       name: 'top-stories',
       component: TopStories,
       meta: new RouteMeta({ title: 'Top Stories' })

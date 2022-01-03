@@ -1,7 +1,8 @@
 <template>
-
   <div>
+    <TopToolbar></TopToolbar>
     <NewsList :newsArticles="newsArticles"></NewsList>
+    <BottomNav></BottomNav>
   </div>
 
 </template>
@@ -11,10 +12,14 @@ import { Component, Vue } from 'vue-property-decorator';
 import newsService from '../services/newsService';
 import NewsList from '../components/NewsList.vue';
 import { NewsArticle } from '@/types';
+import TopToolbar from '../components/TopToolbar.vue';
+import BottomNav from '../components/BottomNav.vue';
 
 @Component({
   components: {
-    NewsList
+    TopToolbar,
+    NewsList,
+    BottomNav
   }
 })
 export default class TopStories extends Vue {

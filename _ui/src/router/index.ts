@@ -52,6 +52,7 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   const routeMeta = to.meta as RouteMeta;
   store.dispatch('topToolbar/changeTitle', routeMeta.title);
+  document.title = routeMeta.title;
   next();
 });
 

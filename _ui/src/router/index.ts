@@ -6,6 +6,8 @@ import TopStories from '../views/TopStories.vue';
 import CodeExamples from '../views/CodeExamples.vue';
 import MyFavorites from '../views/MyFavorites.vue';
 import Home from '../views/Home.vue';
+import Login from '@/views/Login.vue';
+import Register from '@/views/Register.vue';
 
 Vue.use(Router);
 
@@ -26,6 +28,18 @@ const router = new Router({
       name: 'home',
       component: Home,
       meta: new RouteMeta({ title: 'Home' })
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: Register,
+      meta: new RouteMeta({ title: 'Register' })
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login,
+      meta: new RouteMeta({ title: 'Login' })
     },
     {
       path: '/top-stories',

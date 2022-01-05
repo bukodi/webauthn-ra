@@ -9,24 +9,28 @@
       height="200"
       color="primary"
     >
-      <v-toolbar-title>{{ title }}</v-toolbar-title>
-
+      <v-app-bar-title>Webauthn - Registration Authority</v-app-bar-title>
     </v-app-bar>
 
-    <v-btn value="top" :to="{ name: 'top-stories'}">
-      <span>Top Stories</span>
-      <v-icon>thumb_up</v-icon>
-    </v-btn>
+    <v-item-group active-class="primary">
+      <v-container>
+        <v-row>
+          <v-col cols="12" md="4">
+            <v-btn value="register" :to="{ name: 'register'}">
+              <span>Register</span>
+              <v-icon>person_add</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="12" md="4">
+            <v-btn value="login" :to="{ name: 'login'}">
+              <span>Log in</span>
+              <v-icon>login</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-item-group>
 
-    <v-btn value="code" :to="{ name: 'code-examples'}">
-      <span>Code Examples</span>
-      <v-icon>code</v-icon>
-    </v-btn>
-
-    <v-btn value="favorites" :to="{ name: 'my-favorites'}">
-      <span>Favorites</span>
-      <v-icon>favorite</v-icon>
-    </v-btn>
   </div>
 
 </template>

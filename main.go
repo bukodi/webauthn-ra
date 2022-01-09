@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
+	"github.com/bukodi/webauthn-ra/pkg/app"
 	"io/fs"
 	"log"
 	"net/http"
@@ -17,12 +18,30 @@ var uiDist embed.FS
 //go:embed test/articles.json
 var articlesJson []byte
 
+type notFoundRewriteToRootFS struct {
+	wrappedFS http.FileSystem
+}
+
+func (w notFoundRewriteToRootFS) Open(name string) (http.File, error) {
+	f, err := w.wrappedFS.Open(name)
+	if err != nil {
+		fRoot, err := w.wrappedFS.Open("/index.html")
+		return fRoot, err
+	}
+	return f, err
+}
+
 func getFileSystem() http.FileSystem {
 	fsys, err := fs.Sub(uiDist, "_ui/dist")
 	if err != nil {
 		log.Fatal(err)
 	}
-	return http.FS(fsys)
+
+	httpFS := http.FS(fsys)
+
+	wrappedFS := notFoundRewriteToRootFS{wrappedFS: httpFS}
+
+	return &wrappedFS
 }
 
 type countHandler struct {
@@ -40,11 +59,18 @@ func (h *countHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	fs := http.FileServer(getFileSystem())
+	httpsSrv, err := app.NewHttpServer(":3000")
 
-	http.Handle("/api/v1/count", http.StripPrefix("/api/v1/", new(countHandler)))
+	{
+		// Serve static files
+		httpFs := getFileSystem()
+		httpFsHandler := http.FileServer(httpFs)
+		httpsSrv.ServerMux.Handle("/app/", http.StripPrefix("/app/", httpFsHandler))
+	}
 
-	http.Handle("/api/v1/articles", http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+	httpsSrv.ServerMux.Handle("/api/v1/count", http.StripPrefix("/api/v1/", new(countHandler)))
+
+	httpsSrv.ServerMux.Handle("/api/v1/articles", http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		if allowDev {
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 		}
@@ -52,11 +78,8 @@ func main() {
 		w.Write(articlesJson)
 	}))
 
-	// Serve static files
-	http.Handle("/app/", http.StripPrefix("/app/", fs))
-
 	log.Println("Listening on http://localhost:3000/app")
-	err := http.ListenAndServe(":3000", nil)
+	err = httpsSrv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -63,6 +63,9 @@ export default class Register extends Vue {
     console.log('pubKeyCred.id=', pubKeyCred.id);
     console.log('pubKeyCred.type=', pubKeyCred.type);
     console.log('pubKeyCred.rawId=', pubKeyCred.rawId);
+    const authResp = pubKeyCred.response as AuthenticatorAttestationResponse;
+    console.log('authResp.attestationObject=', authResp.attestationObject);
+    console.log('authResp.clientDataJSON=', authResp.clientDataJSON);
   }
 }
 </script>

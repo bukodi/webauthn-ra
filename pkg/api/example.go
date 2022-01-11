@@ -22,12 +22,12 @@ import (
 	"github.com/swaggest/usecase/status"
 )
 
-func ApiRouter() (http.Handler, error) {
+func ApiRouter(contextRoot string) (http.Handler, error) {
 	// Init API documentation schema.
 	apiSchema := &openapi.Collector{}
-	apiSchema.Reflector().SpecEns().Info.Title = "Basic Example"
-	apiSchema.Reflector().SpecEns().Info.WithDescription("This app showcases a trivial REST API.")
-	apiSchema.Reflector().SpecEns().Info.Version = "v1.2.3"
+	apiSchema.Reflector().SpecEns().Info.Title = "Webauthn - Registration Authority"
+	apiSchema.Reflector().SpecEns().Info.WithDescription("Describes REST API of the Webauthn-RA.")
+	apiSchema.Reflector().SpecEns().Info.Version = "v0.0.1"
 
 	// Setup request decoder and validator.
 	validatorFactory := jsonschema.NewFactory(apiSchema, apiSchema)
@@ -90,12 +90,12 @@ func ApiRouter() (http.Handler, error) {
 	u.SetExpectedErrors(status.InvalidArgument)
 
 	// Add use case handler to router.
-	r.Method(http.MethodGet, "/hello/{name}", nethttp.NewHandler(u))
+	r.Method(http.MethodGet, contextRoot+"/hello/{name}", nethttp.NewHandler(u))
 
 	// Swagger UI endpoint at /docs.
-	r.Method(http.MethodGet, "/docs/openapi.json", apiSchema)
-	r.Mount("/docs", swgui.NewHandler(apiSchema.Reflector().Spec.Info.Title,
-		"/docs/openapi.json", "/docs"))
+	r.Method(http.MethodGet, contextRoot+"/docs/openapi.json", apiSchema)
+	r.Mount(contextRoot+"/docs", swgui.NewHandler(apiSchema.Reflector().Spec.Info.Title,
+		contextRoot+"/docs/openapi.json", contextRoot+"/docs"))
 
 	return r, nil
 }

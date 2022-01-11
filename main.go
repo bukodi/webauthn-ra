@@ -59,12 +59,12 @@ func main() {
 		w.Write(articlesJson)
 	}))
 
-	apiHandler, err := api.ApiRouter()
+	apiHandler, err := api.ApiRouter("/api/v1")
 	if err != nil {
 		log.Fatal(err)
 	}
 	httpsSrv.ServerMux.Handle("/", apiHandler)
-	log.Println("API accessible on  http://localhost:3000/docs")
+	log.Println("API accessible on  http://localhost:3000/api/v1/docs")
 
 	err = httpsSrv.ListenAndServe()
 	if err != nil {

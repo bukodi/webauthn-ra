@@ -1,15 +1,21 @@
 package main
 
 import (
+	"embed"
 	_ "embed"
 	"fmt"
+	"github.com/bukodi/webauthn-ra/pkg/api"
 	"github.com/bukodi/webauthn-ra/pkg/app"
+	"io/fs"
 	"log"
 	"net/http"
 	"sync"
 )
 
 const allowDev = true
+
+//go:embed _ui/dist
+var uiDistDir embed.FS
 
 //go:embed test/articles.json
 var articlesJson []byte
@@ -31,11 +37,17 @@ func (h *countHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func main() {
 	httpsSrv, err := app.NewHttpServer(":3000")
 
-	httpFsHandler, err := StaticHttpHandler("/app/")
+	fs, err := fs.Sub(uiDistDir, "_ui/dist")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	httpFsHandler, err := app.StaticHttpHandler("/app/", fs)
 	if err != nil {
 		panic(err)
 	}
 	httpsSrv.ServerMux.Handle("/app/", httpFsHandler)
+	log.Println("UI accessible on  http://localhost:3000/app")
 
 	httpsSrv.ServerMux.Handle("/api/v1/count", http.StripPrefix("/api/v1/", new(countHandler)))
 
@@ -47,7 +59,13 @@ func main() {
 		w.Write(articlesJson)
 	}))
 
-	log.Println("Listening on http://localhost:3000/app")
+	apiHandler, err := api.ApiRouter()
+	if err != nil {
+		log.Fatal(err)
+	}
+	httpsSrv.ServerMux.Handle("/", apiHandler)
+	log.Println("API accessible on  http://localhost:3000/docs")
+
 	err = httpsSrv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)

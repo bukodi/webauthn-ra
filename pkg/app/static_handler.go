@@ -1,20 +1,12 @@
-package main
+package app
 
 import (
-	"embed"
 	"io/fs"
 	"net/http"
 )
 
-//go:embed _ui/dist
-var EmbeddedDir_ui_dist embed.FS
-
-func StaticHttpHandler(contextRoot string) (http.Handler, error) {
-	fsys, err := fs.Sub(EmbeddedDir_ui_dist, "_ui/dist")
-	if err != nil {
-		return nil, err
-	}
-	httpFS := http.FS(fsys)
+func StaticHttpHandler(contextRoot string, fs fs.FS) (http.Handler, error) {
+	httpFS := http.FS(fs)
 	wrappedFS := notFoundRewriteToRootFS{wrappedFS: httpFS}
 	httpFsHandler := http.FileServer(wrappedFS)
 

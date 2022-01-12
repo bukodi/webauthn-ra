@@ -66,6 +66,25 @@ export default class Register extends Vue {
     const authResp = pubKeyCred.response as AuthenticatorAttestationResponse;
     console.log('authResp.attestationObject=', authResp.attestationObject);
     console.log('authResp.clientDataJSON=', authResp.clientDataJSON);
+
+    newsService.registerAuthenticator(
+      this.arrayBufferToBase64(pubKeyCred.rawId),
+      btoa('exampleAttestation'),
+      btoa('exampleClientDatra')
+    ).then(value => {
+      console.log('registerAuthenticator returned=', value);
+    }).catch(reason => {
+      console.log('registerAuthenticator error=', reason);
+    });
+  }
+
+  private arrayBufferToBase64 (buffer: ArrayBuffer): string {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
   }
 }
 </script>

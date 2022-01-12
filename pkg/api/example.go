@@ -22,7 +22,7 @@ import (
 	"github.com/swaggest/usecase/status"
 )
 
-func ApiRouter(contextRoot string) (http.Handler, error) {
+func ApiRouter(pathPrefix string) (http.Handler, error) {
 	// Init API documentation schema.
 	apiSchema := &openapi.Collector{}
 	apiSchema.Reflector().SpecEns().Info.Title = "Webauthn - Registration Authority"
@@ -90,12 +90,12 @@ func ApiRouter(contextRoot string) (http.Handler, error) {
 	u.SetExpectedErrors(status.InvalidArgument)
 
 	// Add use case handler to router.
-	r.Method(http.MethodGet, contextRoot+"/hello/{name}", nethttp.NewHandler(u))
+	r.Method(http.MethodGet, pathPrefix+"/hello/{name}", nethttp.NewHandler(u))
 
 	// Swagger UI endpoint at /docs.
-	r.Method(http.MethodGet, contextRoot+"/docs/openapi.json", apiSchema)
-	r.Mount(contextRoot+"/docs", swgui.NewHandler(apiSchema.Reflector().Spec.Info.Title,
-		contextRoot+"/docs/openapi.json", contextRoot+"/docs"))
+	r.Method(http.MethodGet, pathPrefix+"/docs/openapi.json", apiSchema)
+	r.Mount(pathPrefix+"/docs", swgui.NewHandler(apiSchema.Reflector().Spec.Info.Title,
+		pathPrefix+"/docs/openapi.json", pathPrefix+"/docs"))
 
 	return r, nil
 }

@@ -43,7 +43,7 @@ export default class Register extends Vue {
             alg: -257 // RS256
           }
         ],
-        attestation: 'indirect',
+        attestation: 'direct',
         authenticatorSelection: {
           authenticatorAttachment: 'cross-platform'
         }
@@ -71,14 +71,17 @@ export default class Register extends Vue {
     console.log('pubKeyCred.id=', pubKeyCred.id);
     console.log('pubKeyCred.type=', pubKeyCred.type);
     console.log('pubKeyCred.rawId=', pubKeyCred.rawId);
-    const authResp = pubKeyCred.response as AuthenticatorAttestationResponse;
-    console.log('authResp.attestationObject=', authResp.attestationObject);
-    console.log('authResp.clientDataJSON=', authResp.clientDataJSON);
+    const attestResp = pubKeyCred.response as AuthenticatorAttestationResponse;
+    console.log('authResp.attestationObject=', attestResp.attestationObject);
+    console.log('authResp.clientDataJSON=', attestResp.clientDataJSON);
+    const assertResp = pubKeyCred.response as AuthenticatorAssertionResponse;
+    console.log('assertResp.signature=', assertResp.signature);
+    console.log('assertResp.userHandle=', assertResp.userHandle);
 
     newsService.registerAuthenticator(
       this.arrayBufferToBase64(pubKeyCred.rawId),
-      this.arrayBufferToBase64(authResp.attestationObject),
-      this.arrayBufferToBase64(authResp.clientDataJSON)
+      this.arrayBufferToBase64(attestResp.attestationObject),
+      this.arrayBufferToBase64(attestResp.clientDataJSON)
     ).then(value => {
       console.log('registerAuthenticator returned=', value);
     }).catch(reason => {

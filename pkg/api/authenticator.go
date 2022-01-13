@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/fxamacker/webauthn"
+	_ "github.com/fxamacker/webauthn/fidou2f"
 	"github.com/swaggest/usecase"
 )
 

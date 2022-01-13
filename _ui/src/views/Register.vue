@@ -9,7 +9,6 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import newsService from '../services/newsService';
-import { ArticleType, NewsArticle } from '@/types';
 import TopToolbar from '../components/TopToolbar.vue';
 
 @Component({
@@ -18,8 +17,6 @@ import TopToolbar from '../components/TopToolbar.vue';
   }
 })
 export default class Register extends Vue {
-  newsArticles: NewsArticle[] = [];
-
   mounted () {
     navigator.credentials.create({
       publicKey: {
@@ -43,27 +40,20 @@ export default class Register extends Vue {
             alg: -257 // RS256
           }
         ],
-        attestation: 'direct',
+        attestation: 'indirect',
         authenticatorSelection: {
           authenticatorAttachment: 'cross-platform'
         }
       }
     }).then(value => {
-      console.log('resolved', value);
-      if (value != null) {
-        console.log('---------------');
-        const json = JSON.stringify(value);
-        console.log('--->' + json + '<---');
-        console.log('---------------');
-        this.dumpCread(value);
+      if (value == null) {
+        console.log('null returned.');
+        return;
       }
+      this.dumpCread(value);
     }).catch(error => {
       console.log('rejected', error);
     });
-    newsService.getArticlesByType(ArticleType.CodeExample)
-      .then((newsArticles: NewsArticle[]) => {
-        this.newsArticles = newsArticles;
-      });
   }
 
   dumpCread (cred: Credential) {
@@ -78,11 +68,7 @@ export default class Register extends Vue {
     console.log('assertResp.signature=', assertResp.signature);
     console.log('assertResp.userHandle=', assertResp.userHandle);
 
-    newsService.registerAuthenticator(
-      this.arrayBufferToBase64(pubKeyCred.rawId),
-      this.arrayBufferToBase64(attestResp.attestationObject),
-      this.arrayBufferToBase64(attestResp.clientDataJSON)
-    ).then(value => {
+    newsService.registerAuthenticator(pubKeyCred).then(value => {
       console.log('registerAuthenticator returned=', value);
     }).catch(reason => {
       console.log('registerAuthenticator error=', reason);

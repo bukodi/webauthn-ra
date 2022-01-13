@@ -8,6 +8,18 @@ export interface NewsArticle {
   isFavourite: boolean;
 }
 
+export interface ParsedAttestation {
+  error?: string;
+  publicKeyAlg?: string;
+  publicKeyPEM?: string;
+  authenticatorGUID?: string;
+  authenticatorType?: string;
+  userPresent: boolean;
+  userVerified: boolean;
+  attestnCertSubjectCN?: string;
+  attestnCertIssuerCN?: string;
+}
+
 export enum ArticleType {
   TopStory = 'TOP_STORY',
   CodeExample = 'CODE_EXAMPLE'

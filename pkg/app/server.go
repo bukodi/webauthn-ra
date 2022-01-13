@@ -3,6 +3,7 @@ package app
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 )
@@ -13,11 +14,14 @@ type HttpServer struct {
 }
 
 func NewHttpServer(address string) (*HttpServer, error) {
-	sererMux := http.NewServeMux()
+	serverMux := http.NewServeMux()
+
+	corsHandler := cors.AllowAll().Handler(serverMux)
+
 	srv := HttpServer{
 		Server: http.Server{
 			Addr:    address,
-			Handler: sererMux,
+			Handler: corsHandler,
 			TLSConfig: &tls.Config{
 				Rand:                        nil,
 				Time:                        nil,
@@ -57,7 +61,7 @@ func NewHttpServer(address string) (*HttpServer, error) {
 			BaseContext:       nil,
 			ConnContext:       nil,
 		},
-		ServerMux: sererMux,
+		ServerMux: serverMux,
 	}
 	return &srv, nil
 }

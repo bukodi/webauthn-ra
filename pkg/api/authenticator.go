@@ -1,8 +1,10 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"github.com/fxamacker/webauthn"
 	"github.com/swaggest/usecase"
 )
 
@@ -32,7 +34,25 @@ func RegisterAuthenticatorService() usecase.IOInteractor {
 			out = output.(*registerAuthenticatorOutput)
 		)
 
-		fmt.Printf("input: %+v", in)
+		// Test data adapted from apowers313's fido2-helpers (2019) at https://github.com/apowers313/fido2-helpers/blob/master/fido2-helpers.js
+		attestationTemplate := `{
+			"id":    "%s",
+			"rawId": "%s",
+			"response": {
+				"attestationObject": "%s",
+				"clientDataJSON":    "%s"
+			},
+			"type": "public-key"
+		}`
+		attestJson := fmt.Sprintf(attestationTemplate, in.RawId, in.RawId, in.AttestationObject, in.ClientDataJSON)
+
+		pubKeyAtt, err := webauthn.ParseAttestation(bytes.NewBufferString(attestJson))
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		} else {
+			fmt.Printf("Attestation: %v\n", pubKeyAtt)
+		}
+
 		out.Message = "Ok"
 		return nil
 		//return fmt.Errorf("Something went wrong")

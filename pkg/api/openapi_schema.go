@@ -40,6 +40,7 @@ func ApiRouter(pathPrefix string) (http.Handler, error) {
 		response.EncoderMiddleware,                    // Response encoder setup.
 		gzip.Middleware,                               // Response compression with support for direct gzip pass through.
 	)
+
 	// Add use case handler to router.
 	r.Method(http.MethodPost, pathPrefix+"/authenticator/register", nethttp.NewHandler(RegisterAuthenticatorService()))
 	r.Method(http.MethodGet, pathPrefix+"/hello/{name}", nethttp.NewHandler(HelloService()))

@@ -42,11 +42,19 @@ export default class Register extends Vue {
             type: 'public-key',
             alg: -257 // RS256
           }
-        ]
+        ],
+        attestation: 'indirect',
+        authenticatorSelection: {
+          authenticatorAttachment: 'cross-platform'
+        }
       }
     }).then(value => {
       console.log('resolved', value);
       if (value != null) {
+        console.log('---------------');
+        const json = JSON.stringify(value);
+        console.log('--->' + json + '<---');
+        console.log('---------------');
         this.dumpCread(value);
       }
     }).catch(error => {
@@ -69,8 +77,8 @@ export default class Register extends Vue {
 
     newsService.registerAuthenticator(
       this.arrayBufferToBase64(pubKeyCred.rawId),
-      btoa('exampleAttestation'),
-      btoa('exampleClientDatra')
+      this.arrayBufferToBase64(authResp.attestationObject),
+      this.arrayBufferToBase64(authResp.clientDataJSON)
     ).then(value => {
       console.log('registerAuthenticator returned=', value);
     }).catch(reason => {

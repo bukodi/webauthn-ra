@@ -40,6 +40,9 @@ class NewsService {
   registerAuthenticator (rawId: string, attestationObject: string, clientDataJSON: string): Promise<any> {
     return fetch(process.env.VUE_APP_SERVER_API_URL + '/authenticator/register', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         rawId: rawId,
         attestationObject: attestationObject,

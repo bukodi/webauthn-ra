@@ -2,6 +2,15 @@ import { ArticleType, NewsArticle, ParsedAttestation } from '@/types';
 
 const url = process.env.VUE_APP_SERVER_API_URL + '/articles';
 
+function arrayBufferToBase64 (buffer: ArrayBuffer): string {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+}
+
 class NewsService {
   getArticlesByType (articleType: ArticleType): Promise<NewsArticle[]> {
     return fetch(url)
@@ -39,34 +48,33 @@ class NewsService {
 
   registerAuthenticator (cred: Credential): Promise<ParsedAttestation> {
     const pubKeyCred = cred as PublicKeyCredential;
-    console.log('pubKeyCred.id=', pubKeyCred.id);
-    console.log('pubKeyCred.type=', pubKeyCred.type);
-    console.log('pubKeyCred.rawId=', pubKeyCred.rawId);
     const attestResp = pubKeyCred.response as AuthenticatorAttestationResponse;
-    console.log('authResp.attestationObject=', attestResp.attestationObject);
-    console.log('authResp.clientDataJSON=', attestResp.clientDataJSON);
-    const assertResp = pubKeyCred.response as AuthenticatorAssertionResponse;
+
+    console.log('rawId : ', pubKeyCred.rawId);
+
+    const bodyStr = JSON.stringify({
+      id: pubKeyCred.id,
+      rawId: arrayBufferToBase64(pubKeyCred.rawId),
+      response: {
+        attestationObject: arrayBufferToBase64(attestResp.attestationObject),
+        clientDataJSON: arrayBufferToBase64(attestResp.clientDataJSON)
+      },
+      type: pubKeyCred.type
+    });
+    console.log('Request body: ' + bodyStr);
+
     return fetch(process.env.VUE_APP_SERVER_API_URL + '/authenticator/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        id: pubKeyCred.id,
-        rawId: pubKeyCred.rawId,
-        response: {
-          attestationObject: attestResp.attestationObject,
-          clientDataJSON: attestResp.clientDataJSON
-        },
-        type: pubKeyCred.type
-      })
+      body: bodyStr
     })
       .then((response) => {
         return response.json();
       })
       .then((response) => {
-        const obj = response.json();
-        return (obj as ParsedAttestation);
+        const obj = response as ParsedAttestation;
         return {
           error: obj.error,
           publicKeyAlg: obj.publicKeyAlg,

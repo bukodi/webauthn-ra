@@ -120,6 +120,15 @@ func RegisterAuthenticatorService() usecase.IOInteractor {
 			return fmt.Errorf("Can't YoubikeyRootCert")
 		}
 
+		var attExpectedData webauthn.AttestationExpectedData
+		attType, trustPath, err := webauthn.VerifyAttestation(pubKeyAtt, &attExpectedData)
+		if err != nil {
+			out.Error = err.Error()
+		} else {
+			fmt.Printf("attType: %s\n", attType.String())
+			fmt.Printf("trustPath: %+v\n", trustPath)
+		}
+
 		if pubKeyAtt.AttStmt != nil {
 			test := []uint8{0, 1}
 			fmt.Printf("test dump: %s\n\n", base64.StdEncoding.EncodeToString(test))

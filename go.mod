@@ -12,11 +12,16 @@ require (
 require (
 	github.com/fxamacker/webauthn v0.6.1
 	github.com/rs/cors v1.8.2
+	gorm.io/driver/sqlite v1.2.6
+	gorm.io/gorm v1.22.5
 )
 
 require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/fxamacker/cbor/v2 v2.2.0 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.4 // indirect
+	github.com/mattn/go-sqlite3 v1.14.9 // indirect
 	github.com/santhosh-tekuri/jsonschema/v3 v3.1.0 // indirect
 	github.com/shurcooL/httpgzip v0.0.0-20190720172056-320755c1c1b0 // indirect
 	github.com/swaggest/form/v5 v5.0.1 // indirect

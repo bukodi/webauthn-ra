@@ -26,3 +26,7 @@ Then open http://localhost:8080/dev
 - Webauthn
 - OpenAPI V3 (swaggest)
 - GORM
+
+## Useful docs:
+REST API recommendation:
+https://fidoalliance.org/specs/fido-v2.0-rd-20180702/fido-server-v2.0-rd-20180702.html

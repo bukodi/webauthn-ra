@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-const pem_Yubico_U2F_Root_CA_Serial_457200631 = `
+const pem_Yubico_Root_CA = `
 -----BEGIN CERTIFICATE-----
 MIIDHjCCAgagAwIBAgIEG0BT9zANBgkqhkiG9w0BAQsFADAuMSwwKgYDVQQDEyNZ
 dWJpY28gVTJGIFJvb3QgQ0EgU2VyaWFsIDQ1NzIwMDYzMTAgFw0xNDA4MDEwMDAw
@@ -28,7 +28,7 @@ U9psmyPzK+Vsgw2jeRQ5JlKDyqE0hebfC1tvFu0CCrJFcw==
 -----END CERTIFICATE-----`
 
 func TestYubiCert(t *testing.T) {
-	block, _ := pem.Decode([]byte(pem_Yubico_U2F_Root_CA_Serial_457200631))
+	block, _ := pem.Decode([]byte(pem_Yubico_Root_CA))
 	yubiRoot, err := x509.ParseCertificate(block.Bytes)
 	if err != nil {
 		t.Fatal(err)
@@ -40,9 +40,16 @@ func TestYubiCert(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	sysPool, err := x509.SystemCertPool()
+	if err != nil {
+		t.Fatal(err)
+	}
+	sysPool.AddCert(yubiRoot)
+
 	var opts x509.VerifyOptions
-	opts.Roots = x509.NewCertPool()
-	opts.Roots.AddCert(yubiRoot)
+	//opts.Roots = x509.NewCertPool()
+	//opts.Roots.AddCert(yubiRoot)
 	chain, err := devCert.Verify(opts)
 	if err != nil {
 		t.Fatal(err)

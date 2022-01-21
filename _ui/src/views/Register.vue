@@ -8,8 +8,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import newsService from '../services/newsService';
 import TopToolbar from '../components/TopToolbar.vue';
+import webauthnService from '@/services/webauthnService';
 
 @Component({
   components: {
@@ -68,7 +68,7 @@ export default class Register extends Vue {
     console.log('assertResp.signature=', assertResp.signature);
     console.log('assertResp.userHandle=', assertResp.userHandle);
 
-    newsService.registerAuthenticator(pubKeyCred).then(value => {
+    webauthnService.registerAuthenticator(pubKeyCred).then(value => {
       console.log('registerAuthenticator returned=', value);
     }).catch(reason => {
       console.log('registerAuthenticator error=', reason);

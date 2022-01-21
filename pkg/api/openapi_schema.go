@@ -42,7 +42,7 @@ func ApiRouter(pathPrefix string) (http.Handler, error) {
 	)
 
 	// Add use case handler to router.
-	r.Method(http.MethodPost, pathPrefix+"/authenticator/register", nethttp.NewHandler(RegisterAuthenticatorService()))
+	r.Method(http.MethodPost, pathPrefix+"/authenticator/register", nethttp.NewHandler(WebauthnAttestationRegisterREST()))
 	r.Method(http.MethodGet, pathPrefix+"/hello/{name}", nethttp.NewHandler(HelloService()))
 
 	// Swagger UI endpoint at /docs.

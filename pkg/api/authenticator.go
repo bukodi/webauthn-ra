@@ -43,7 +43,7 @@ type Authenticator struct {
 	authenticatorData []byte
 }
 
-func RegisterAuthenticatorService() usecase.IOInteractor {
+func WebauthnAttestationRegisterREST() usecase.IOInteractor {
 
 	// Declare input port type.
 	type attestationResponse struct {

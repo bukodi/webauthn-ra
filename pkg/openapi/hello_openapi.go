@@ -1,4 +1,4 @@
-package api
+package openapi
 
 import (
 	"context"
@@ -6,8 +6,13 @@ import (
 	"fmt"
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
+	"net/http"
 	"time"
 )
+
+func init() {
+	AddUseCase(http.MethodGet, "/hello/{name}", HelloService())
+}
 
 func HelloService() usecase.IOInteractor {
 	// Declare input port type.

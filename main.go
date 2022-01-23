@@ -3,15 +3,16 @@ package main
 import (
 	"crypto/x509"
 	"embed"
-	_ "embed"
 	"fmt"
-	"github.com/bukodi/webauthn-ra/pkg/api"
 	"github.com/bukodi/webauthn-ra/pkg/app"
+	"github.com/bukodi/webauthn-ra/pkg/openapi"
 	"github.com/fxamacker/webauthn"
 	"io/fs"
 	"log"
 	"net/http"
 	"sync"
+
+	_ "github.com/bukodi/webauthn-ra/pkg/webauthn"
 )
 
 const allowDev = true
@@ -86,7 +87,7 @@ func main() {
 		w.Write(articlesJson)
 	}))
 
-	apiHandler, err := api.ApiRouter("/api/v1")
+	apiHandler, err := openapi.ApiRouter("/api/v1")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,4 +1,4 @@
-package api
+package openapi
 
 import (
 	"github.com/go-chi/chi/v5"
@@ -12,10 +12,30 @@ import (
 	"github.com/swaggest/rest/response"
 	"github.com/swaggest/rest/response/gzip"
 	swgui "github.com/swaggest/swgui/v4"
+	"github.com/swaggest/usecase"
 	"net/http"
 )
 
+type restPath struct {
+	method  string
+	path    string
+	usecase usecase.IOInteractor
+}
+
+var restPaths []restPath = make([]restPath, 0)
+
+func AddUseCase(method string, path string, useCase usecase.IOInteractor) {
+	restPaths = append(restPaths, restPath{
+		method:  method,
+		path:    path,
+		usecase: useCase,
+	})
+}
+
 func ApiRouter(pathPrefix string) (http.Handler, error) {
+
+	r := chirouter.NewWrapper(chi.NewRouter())
+
 	// Init API documentation schema.
 	apiSchema := &openapi.Collector{}
 	apiSchema.Reflector().SpecEns().Info.Title = "Webauthn - Registration Authority"
@@ -28,9 +48,6 @@ func ApiRouter(pathPrefix string) (http.Handler, error) {
 	decoderFactory.ApplyDefaults = true
 	decoderFactory.SetDecoderFunc(rest.ParamInPath, chirouter.PathToURLValues)
 
-	// Create router.
-	r := chirouter.NewWrapper(chi.NewRouter())
-
 	// Setup middlewares.
 	r.Use(
 		middleware.Recoverer,                          // Panic recovery.
@@ -42,8 +59,9 @@ func ApiRouter(pathPrefix string) (http.Handler, error) {
 	)
 
 	// Add use case handler to router.
-	r.Method(http.MethodPost, pathPrefix+"/authenticator/register", nethttp.NewHandler(WebauthnAttestationRegisterREST()))
-	r.Method(http.MethodGet, pathPrefix+"/hello/{name}", nethttp.NewHandler(HelloService()))
+	for _, rp := range restPaths {
+		r.Method(rp.method, pathPrefix+rp.path, nethttp.NewHandler(rp.usecase))
+	}
 
 	// Swagger UI endpoint at /docs.
 	r.Method(http.MethodGet, pathPrefix+"/docs/openapi.json", apiSchema)

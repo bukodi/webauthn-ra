@@ -131,7 +131,7 @@ export default class Register extends Vue {
     console.log('assertResp.signature=', assertResp.signature);
     console.log('assertResp.userHandle=', assertResp.userHandle);
 
-    webauthnService.registerAuthenticator(pubKeyCred).then(value => {
+    webauthnService.attestationResult(pubKeyCred).then(value => {
       console.log('registerAuthenticator returned=', value);
     }).catch(reason => {
       console.log('registerAuthenticator error=', reason);

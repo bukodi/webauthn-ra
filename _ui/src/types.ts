@@ -20,6 +20,10 @@ export interface ParsedAttestation {
   attestnCertIssuerCN?: string;
 }
 
+export interface ServerPublicKeyCredentialCreationOptionsResponse {
+
+}
+
 export enum ArticleType {
   TopStory = 'TOP_STORY',
   CodeExample = 'CODE_EXAMPLE'

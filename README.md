@@ -27,8 +27,12 @@ Then open http://localhost:8080/dev
 - OpenAPI V3 (swaggest)
 - GORM
 
-## TODO:
-[ ] Add global error handling (`window.onerror`)
+## TODO
+- List of last logins (list of issued JTWs)
+- Rate limiting (distributed way), provide for  
+    Provide backlog length for health monitoring and scale up/down service 
+- Add request/response debug logger
+- Add global error handling (`window.onerror`) forward to server 
 
 ## Useful docs:
 REST API recommendation:

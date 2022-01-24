@@ -71,6 +71,8 @@ export default class Register extends Vue {
     console.log('TODO: testing avaiable authenticators');
     if (window.PublicKeyCredential) {
       console.log('Webauthn supported');
+      // eslint-disable-next-line no-undef
+      PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(available => console.log('User verification supported: ', available));
     } else {
       console.log('Webauthn NOT supported');
     }

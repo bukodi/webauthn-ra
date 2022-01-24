@@ -27,6 +27,9 @@ Then open http://localhost:8080/dev
 - OpenAPI V3 (swaggest)
 - GORM
 
+## TODO:
+[ ] Add global error handling (`window.onerror`)
+
 ## Useful docs:
 REST API recommendation:
 https://fidoalliance.org/specs/fido-v2.0-rd-20180702/fido-server-v2.0-rd-20180702.html

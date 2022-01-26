@@ -37,3 +37,5 @@ Then open http://localhost:8080/dev
 ## Useful docs:
 REST API recommendation:
 https://fidoalliance.org/specs/fido-v2.0-rd-20180702/fido-server-v2.0-rd-20180702.html
+Icons:
+https://jossef.github.io/material-design-icons-iconfont/

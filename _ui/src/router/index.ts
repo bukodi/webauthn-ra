@@ -8,6 +8,7 @@ import MyFavorites from '../views/MyFavorites.vue';
 import Home from '../views/Home.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
+import RegisterFIDO from '@/views/RegisterFIDO.vue';
 
 Vue.use(Router);
 
@@ -34,6 +35,12 @@ const router = new Router({
       name: 'register',
       component: Register,
       meta: new RouteMeta({ title: 'Register' })
+    },
+    {
+      path: '/register-fido',
+      name: 'register-fido',
+      component: RegisterFIDO,
+      meta: new RouteMeta({ title: 'Register FIDO Authenticator' })
     },
     {
       path: '/login',

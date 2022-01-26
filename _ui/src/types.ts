@@ -21,7 +21,9 @@ export interface ParsedAttestation {
 }
 
 export interface ServerPublicKeyCredentialCreationOptionsResponse {
-
+  status: string;
+  errorMessage: string;
+  challenge: string;
 }
 
 export enum ArticleType {

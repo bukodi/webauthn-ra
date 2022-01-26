@@ -1,4 +1,4 @@
-import {ParsedAttestation, ServerPublicKeyCredentialCreationOptionsResponse} from '@/types';
+import { ParsedAttestation, ServerPublicKeyCredentialCreationOptionsResponse } from '@/types';
 
 function arrayBufferToBase64 (buffer: ArrayBuffer): string {
   let binary = '';
@@ -10,16 +10,16 @@ function arrayBufferToBase64 (buffer: ArrayBuffer): string {
 }
 
 class WebauthnService {
-  attestationOptions ( type: AuthenticatorAttachment): Promise<PublicKeyCredentialCreationOptions | null> {
+  attestationOptions (type: AuthenticatorAttachment): Promise<PublicKeyCredentialCreationOptions | null> {
     const bodyStr = JSON.stringify({
-      username: "johndoe@example.com",
-      displayName: "John Doe",
+      username: 'johndoe@example.com',
+      displayName: 'John Doe',
       authenticatorSelection: {
         residentKey: false,
-        authenticatorAttachment: "cross-platform",
-        userVerification: "preferred"
+        authenticatorAttachment: 'cross-platform',
+        userVerification: 'preferred'
       },
-      attestation: "direct"
+      attestation: 'direct'
     });
 
     return fetch(process.env.VUE_APP_SERVER_API_URL + '/authenticator/options', {
@@ -34,8 +34,7 @@ class WebauthnService {
       })
       .then((response) => {
         const obj = response as ServerPublicKeyCredentialCreationOptionsResponse;
-        return {
-        } as PublicKeyCredentialCreationOptions;
+        return {} as PublicKeyCredentialCreationOptions;
       })
       .catch((e) => {
         console.error('An error occurred register authenticator', e);

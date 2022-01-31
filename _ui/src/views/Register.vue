@@ -36,7 +36,7 @@
           </v-card>
         </v-col>
         <v-col cols="12" sm="4">
-          <v-card dark class="mx-auto" color="primary" max-width="400" disabled>
+          <v-card dark class="mx-auto" color="secondary" max-width="400" disabled>
             <v-card-title>
               <v-icon large right>dialpad</v-icon>
               <span class="font-weight-bold">Authenticator emulator</span>

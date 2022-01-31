@@ -27,6 +27,22 @@ Then open http://localhost:8080/dev
 - OpenAPI V3 (swaggest)
 - GORM
 
+## Data domains:
+### Audit log
+Append only
+
+### Config
+Transaction log, with signer info
+Cumulative state hash
+Time machine function
+No anonymization support
+Rollback on concurrent modification
+
+### Generic data
+Multiple version of a record
+Anonymization support
+Explicit previous record
+
 ## TODO
 - List of last logins (list of issued JTWs)
 - Rate limiting (distributed way), provide for  
@@ -39,3 +55,5 @@ REST API recommendation:
 https://fidoalliance.org/specs/fido-v2.0-rd-20180702/fido-server-v2.0-rd-20180702.html
 Icons:
 https://jossef.github.io/material-design-icons-iconfont/
+
+

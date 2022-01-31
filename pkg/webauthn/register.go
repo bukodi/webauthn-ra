@@ -14,10 +14,10 @@ func init() {
 }
 
 func AttestationOptionsREST() usecase.IOInteractor {
-	u := usecase.NewIOI(new(attestationOptionsInput), new(attestationOptionsOutput), func(ctx context.Context, input, output interface{}) error {
+	u := usecase.NewIOI(new(ServerPublicKeyCredentialCreationOptionsRequest), new(ServerPublicKeyCredentialCreationOptionsResponse), func(ctx context.Context, input, output interface{}) error {
 		var (
-			in  = input.(*attestationOptionsInput)
-			out = output.(*attestationOptionsOutput)
+			in  = input.(*ServerPublicKeyCredentialCreationOptionsRequest)
+			out = output.(*ServerPublicKeyCredentialCreationOptionsResponse)
 		)
 		err := GetAttestationOptions(ctx, in, out)
 		if err != nil {

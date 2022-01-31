@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/bukodi/webauthn-ra/pkg/openapi"
 	"github.com/bukodi/webauthn-ra/pkg/pkglog"
 	"github.com/fxamacker/webauthn"
 )
@@ -48,8 +49,7 @@ type registerAuthenticatorInput struct {
 }
 
 type registerAuthenticatorOutput struct {
-	Status               string `json:"status"`
-	ErrorMessage         string `json:"errorMessage"`
+	openapi.ServerResponse
 	PublicKeyAlg         string `json:"publicKeyAlg,omitempty"`
 	PublicKeyPEM         string `json:"publicKeyPEM,omitempty"`
 	AuthenticatorGUID    string `json:"authenticatorGUID,omitempty"`
@@ -60,17 +60,16 @@ type registerAuthenticatorOutput struct {
 	AttestnCertIssuerCN  string `json:"attestnCertIssuerCN,omitempty"`
 }
 
-type attestationOptionsInput struct {
+type ServerPublicKeyCredentialCreationOptionsRequest struct {
 	UserName string `json:"userName,omitempty"`
 }
 
-type attestationOptionsOutput struct {
-	Status       string `json:"status"`
-	ErrorMessage string `json:"errorMessage"`
-	Challenge    string `json:"challenge,omitempty"`
+type ServerPublicKeyCredentialCreationOptionsResponse struct {
+	openapi.ServerResponse
+	Challenge string `json:"challenge,omitempty"`
 }
 
-func GetAttestationOptions(ctx context.Context, in *attestationOptionsInput, out *attestationOptionsOutput) error {
+func GetAttestationOptions(ctx context.Context, in *ServerPublicKeyCredentialCreationOptionsRequest, out *ServerPublicKeyCredentialCreationOptionsResponse) error {
 	out.Challenge = "uhUjPNlZfvn7onwuhNdsLPkkE5Fv-lUN"
 	return nil
 }

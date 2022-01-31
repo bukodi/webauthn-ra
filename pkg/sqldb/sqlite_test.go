@@ -1,22 +1,26 @@
 package sqldb
 
 import (
+	"context"
 	"github.com/bukodi/webauthn-ra/pkg/model"
-	"gorm.io/driver/sqlite"
 	"os"
 	"testing"
 
 	_ "gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
 
 func TestDB(t *testing.T) {
 	os.Remove("test.db")
-	var cfg gorm.Config
-	db, err := gorm.Open(sqlite.Open("test.db"), &cfg)
+
+	db, err := OpenGormDB(context.Background(), &Config{
+		driver: "sqlite",
+		dsn:    "test.db",
+	})
+
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	// Migrate the schema
 	db.AutoMigrate(&model.AuthenticatorModel{})
 

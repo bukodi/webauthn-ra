@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	openapi.AddUseCase(http.MethodPost, "/webauthn/attestation/options", AttestationOptionsREST())
+	openapi.AddUseCase(http.MethodPost, "/webauthn/attestation/config", AttestationOptionsREST())
 	openapi.AddUseCase(http.MethodPost, "/webauthn/attestation/result", AttestationResultREST())
 }
 

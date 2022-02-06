@@ -9,8 +9,8 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/bukodi/webauthn-ra/pkg/errs"
 	"github.com/bukodi/webauthn-ra/pkg/openapi"
-	"github.com/bukodi/webauthn-ra/pkg/pkglog"
 	"github.com/fxamacker/webauthn"
 )
 
@@ -78,14 +78,14 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(in)
 	if err != nil {
-		return pkglog.Handle(ctx, err)
+		return errs.Handle(ctx, err)
 	} else {
 		inputStr := buf.String()
 		fmt.Printf("Input: %s\n\n", inputStr)
 	}
 	pubKeyAtt, err := webauthn.ParseAttestation(bytes.NewReader(buf.Bytes()))
 	if err != nil {
-		return pkglog.Handle(ctx, err)
+		return errs.Handle(ctx, err)
 	}
 
 	out.AuthenticatorGUID = hex.EncodeToString(pubKeyAtt.AuthnData.AAGUID)
@@ -97,7 +97,7 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 			pubKey := pubKeyAtt.AuthnData.Credential.PublicKey
 			pubKeyBytes, err := x509.MarshalPKIXPublicKey(pubKey)
 			if err != nil {
-				return pkglog.Handle(ctx, err)
+				return errs.Handle(ctx, err)
 			} else {
 				pemBytes := pem.EncodeToMemory(&pem.Block{
 					Type:  "PUBLIC KEY",
@@ -111,7 +111,7 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 
 	sysPool, err := x509.SystemCertPool()
 	if err != nil {
-		return pkglog.Handle(ctx, err)
+		return errs.Handle(ctx, err)
 	}
 	if !sysPool.AppendCertsFromPEM([]byte(pem_Yubico_U2F_Root_CA_Serial_457200631)) {
 		return fmt.Errorf("Can't YoubikeyRootCert")
@@ -120,7 +120,7 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 	var attExpectedData webauthn.AttestationExpectedData
 	attType, trustPath, err := webauthn.VerifyAttestation(pubKeyAtt, &attExpectedData)
 	if err != nil {
-		return pkglog.Handle(ctx, err)
+		return errs.Handle(ctx, err)
 	} else {
 		fmt.Printf("attType: %s\n", attType.String())
 		fmt.Printf("trustPath: %+v\n", trustPath)
@@ -133,7 +133,7 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 
 		attType, trustPath, err := pubKeyAtt.VerifyAttestationStatement()
 		if err != nil {
-			return pkglog.Handle(ctx, err)
+			return errs.Handle(ctx, err)
 		} else {
 			fmt.Printf("attType: %s\n", attType.String())
 			fmt.Printf("trustPath: %+v\n", trustPath)

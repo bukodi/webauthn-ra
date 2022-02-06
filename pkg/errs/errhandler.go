@@ -1,4 +1,4 @@
-package pkglog
+package errs
 
 import (
 	"context"

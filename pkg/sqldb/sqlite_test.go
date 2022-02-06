@@ -22,6 +22,7 @@ func TestDB(t *testing.T) {
 	}
 
 	// Migrate the schema
+	db.AutoMigrate(&model.Authenticator{})
 	db.AutoMigrate(&model.AuthenticatorModel{})
 
 	// Create

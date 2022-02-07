@@ -12,7 +12,7 @@ import (
 func TestDB(t *testing.T) {
 	os.Remove("test.db")
 
-	db, err := OpenGormDB(context.Background(), &Config{
+	db, err := openGormDB(context.Background(), &Config{
 		driver: "sqlite",
 		dsn:    "test.db",
 	})

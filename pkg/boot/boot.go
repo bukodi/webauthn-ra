@@ -5,7 +5,7 @@ import (
 	"github.com/bukodi/webauthn-ra/pkg/config"
 	"github.com/bukodi/webauthn-ra/pkg/errs"
 	"github.com/bukodi/webauthn-ra/pkg/repo"
-	"github.com/bukodi/webauthn-ra/pkg/sqldb"
+	"github.com/bukodi/webauthn-ra/pkg/repo/sqldb"
 )
 
 func Boot(ctx context.Context) error {

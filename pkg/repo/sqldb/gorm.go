@@ -14,13 +14,26 @@ type Config struct {
 	// credential
 }
 
-type Tx interface {
-	WriteTx() *gorm.DB
+var dbInstance *gorm.DB
+
+func Init(db *gorm.DB) error {
+	dbInstance = db
+
+	// Register model types
+	if err := dbInstance.AutoMigrate(&model.AuthenticatorModel{}); err != nil {
+		return errs.Handle(nil, err)
+	}
+	if err := dbInstance.AutoMigrate(&model.Authenticator{}); err != nil {
+		return errs.Handle(nil, err)
+	}
+	return nil
 }
 
-func OpenGormDB(ctx context.Context, cfg *Config) (*gorm.DB, error) {
+func openGormDB(ctx context.Context, cfg *Config) (*gorm.DB, error) {
 	var dialector gorm.Dialector
-	var gormCfg gorm.Config
+	var gormCfg = gorm.Config{
+		SkipDefaultTransaction: true,
+	}
 
 	if cfg.driver == "sqlite" {
 		dialector = sqlite.Open(cfg.dsn)

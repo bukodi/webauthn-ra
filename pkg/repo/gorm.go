@@ -1,4 +1,4 @@
-package sqldb
+package repo
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 )
 
 type Config struct {
-	driver string
-	dsn    string
+	Driver string
+	Dsn    string
 	// credential
 }
 
@@ -22,21 +22,23 @@ func Init(ctx context.Context, cfg *Config) error {
 		SkipDefaultTransaction: true,
 	}
 
-	if cfg.driver == "sqlite" {
-		dialector = sqlite.Open(cfg.dsn)
+	if cfg.Driver == "sqlite" {
+		dialector = sqlite.Open(cfg.Dsn)
 	} else {
-		return errs.Handle(ctx, &ErrUnsupportedDriver{driver: cfg.driver})
+		return errs.Handle(ctx, &ErrUnsupportedDriver{driver: cfg.Driver})
 	}
 
-	dbInstance, err := gorm.Open(dialector, &gormCfg)
+	db, err := gorm.Open(dialector, &gormCfg)
 	if err != nil {
 		return errs.Handle(ctx, err)
 	}
-	// Migrate the schema
-	err = dbInstance.AutoMigrate(&model.AuthenticatorModel{})
-	if err != nil {
-		return errs.Handle(ctx, err)
-	}
+	dbInstance = db
 
 	return nil
+}
+
+func RegisterType[R model.Record]() error {
+	var r R
+	err := dbInstance.AutoMigrate(&r)
+	return errs.Handle(nil, err)
 }

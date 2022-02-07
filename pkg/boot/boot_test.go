@@ -6,5 +6,7 @@ import (
 )
 
 func TestBoot(t *testing.T) {
-	Boot(context.Background())
+	if err := Boot(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 }

@@ -4,10 +4,13 @@ import (
 	"context"
 	"github.com/bukodi/webauthn-ra/pkg/config"
 	"github.com/bukodi/webauthn-ra/pkg/errs"
-	"github.com/bukodi/webauthn-ra/pkg/repo/sqldb"
+	"github.com/bukodi/webauthn-ra/pkg/repo"
 )
 
+const cfgPathDatabase = "database"
+
 func Boot(ctx context.Context) error {
+	var err error
 
 	if ctx == nil {
 		ctx = context.TODO()
@@ -16,12 +19,16 @@ func Boot(ctx context.Context) error {
 	if err := config.Load(); err != nil {
 		return errs.Handle(ctx, err)
 	}
-	var dbOpts sqldb.Config
-	if err := config.InitStruct(&dbOpts); err != nil {
+	var dbOpts repo.Config
+	if err := config.InitStruct(cfgPathDatabase, &dbOpts); err != nil {
 		return errs.Handle(ctx, err)
 	}
-	err := sqldb.Init(ctx, &dbOpts)
+	err = repo.Init(ctx, &dbOpts)
 	if err != nil {
+		return errs.Handle(ctx, err)
+	}
+
+	if err = repo.RegisterTypes(); err != nil {
 		return errs.Handle(ctx, err)
 	}
 	return nil

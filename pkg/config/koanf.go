@@ -30,11 +30,11 @@ func Load() error {
 	return nil
 }
 
-func InitStruct(cfg interface{}) error {
+func InitStruct(path string, cfg interface{}) error {
 	opts := koanf.UnmarshalConf{
 		DecoderConfig: nil,
 	}
-	err := k.UnmarshalWithConf("", cfg, opts)
+	err := k.UnmarshalWithConf(path, cfg, opts)
 	return err
 }
 

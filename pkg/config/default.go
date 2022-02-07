@@ -1,3 +1,12 @@
 package config
 
-var DefaultJSON = ``
+var DefaultJSON = `{
+	"database": {
+		"driver": "sqlite",
+		"dsn": "file::memory:"
+	},
+	"logging": {
+	},
+	"listeners": {
+	}
+}`

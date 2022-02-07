@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/bukodi/webauthn-ra/pkg/config"
 	"github.com/bukodi/webauthn-ra/pkg/errs"
-	"github.com/bukodi/webauthn-ra/pkg/repo"
 	"github.com/bukodi/webauthn-ra/pkg/repo/sqldb"
 )
 
@@ -21,11 +20,8 @@ func Boot(ctx context.Context) error {
 	if err := config.InitStruct(&dbOpts); err != nil {
 		return errs.Handle(ctx, err)
 	}
-	db, err := sqldb.OpenGormDB(ctx, &dbOpts)
+	err := sqldb.Init(ctx, &dbOpts)
 	if err != nil {
-		return errs.Handle(ctx, err)
-	}
-	if err = repo.Init(db); err != nil {
 		return errs.Handle(ctx, err)
 	}
 	return nil

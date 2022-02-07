@@ -8,7 +8,7 @@ import (
 
 var yalaLog logger.Global
 
-func Debuf(ctx context.Context, format string, a ...interface{}) {
+func Debugf(ctx context.Context, format string, a ...interface{}) {
 	yalaLog.Debug(ctx, fmt.Sprintf(format, a))
 }
 

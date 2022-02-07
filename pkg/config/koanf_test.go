@@ -14,12 +14,6 @@ func TestDefault(t *testing.T) {
 		"key3": "Value 3", 
 		"key4": "Value 4" 
 	}`
-	DefaultYAML = `# Default config
-key1: "Value 1"
-# Comment for key3
-key3: "Value 3" 
-key4: "Value 4"
-`
 
 	if err := Load(); err != nil {
 		t.Fatal(err)
@@ -32,6 +26,4 @@ key4: "Value 4"
 	json, _ := ExportJSON()
 	t.Logf("As JSON: \n%s\n", json)
 
-	yaml, _ := ExportYAML()
-	t.Logf("As YAML: \n%s\n", yaml)
 }

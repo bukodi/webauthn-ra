@@ -16,20 +16,7 @@ type Config struct {
 
 var dbInstance *gorm.DB
 
-func Init(db *gorm.DB) error {
-	dbInstance = db
-
-	// Register model types
-	if err := dbInstance.AutoMigrate(&model.AuthenticatorModel{}); err != nil {
-		return errs.Handle(nil, err)
-	}
-	if err := dbInstance.AutoMigrate(&model.Authenticator{}); err != nil {
-		return errs.Handle(nil, err)
-	}
-	return nil
-}
-
-func openGormDB(ctx context.Context, cfg *Config) (*gorm.DB, error) {
+func Init(ctx context.Context, cfg *Config) error {
 	var dialector gorm.Dialector
 	var gormCfg = gorm.Config{
 		SkipDefaultTransaction: true,
@@ -38,18 +25,18 @@ func openGormDB(ctx context.Context, cfg *Config) (*gorm.DB, error) {
 	if cfg.driver == "sqlite" {
 		dialector = sqlite.Open(cfg.dsn)
 	} else {
-		return nil, errs.Handle(ctx, &ErrUnsupportedDriver{driver: cfg.driver})
+		return errs.Handle(ctx, &ErrUnsupportedDriver{driver: cfg.driver})
 	}
 
-	db, err := gorm.Open(dialector, &gormCfg)
+	dbInstance, err := gorm.Open(dialector, &gormCfg)
 	if err != nil {
-		return nil, errs.Handle(ctx, err)
+		return errs.Handle(ctx, err)
 	}
 	// Migrate the schema
-	err = db.AutoMigrate(&model.AuthenticatorModel{})
+	err = dbInstance.AutoMigrate(&model.AuthenticatorModel{})
 	if err != nil {
-		return nil, errs.Handle(ctx, err)
+		return errs.Handle(ctx, err)
 	}
 
-	return db, nil
+	return nil
 }

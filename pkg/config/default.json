@@ -9,7 +9,7 @@
     {
       "name": "frontend",
       "protocol": "https",
-      "address": "*:443",
+      "address": ":3000",
       "handlers": ["ui","api"]
     },
     {

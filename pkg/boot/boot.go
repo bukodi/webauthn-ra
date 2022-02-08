@@ -8,6 +8,7 @@ import (
 )
 
 const cfgPathDatabase = "database"
+const cfgPathListeners = "listeners"
 
 func Boot(ctx context.Context) error {
 	var err error
@@ -31,5 +32,9 @@ func Boot(ctx context.Context) error {
 	if err = repo.RegisterTypes(); err != nil {
 		return errs.Handle(ctx, err)
 	}
+
+	listenersCfg := make([]map[string]interface{}, 0)
+	config.InitStruct(cfgPathListeners, &listenersCfg)
+
 	return nil
 }

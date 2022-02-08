@@ -6,13 +6,13 @@ import (
 )
 
 func RegisterTypes() error {
-	if err := RegisterType[model.Challenge](); err != nil {
+	if err := RegisterType[*model.Challenge](); err != nil {
 		return errs.Handle(nil, err)
 	}
-	if err := RegisterType[model.Authenticator](); err != nil {
+	if err := RegisterType[*model.Authenticator](); err != nil {
 		return errs.Handle(nil, err)
 	}
-	if err := RegisterType[model.AuthenticatorModel](); err != nil {
+	if err := RegisterType[*model.AuthenticatorModel](); err != nil {
 		return errs.Handle(nil, err)
 	}
 	return nil

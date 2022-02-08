@@ -1,7 +1,5 @@
 package model
 
-import "encoding/json"
-
 var _ Record = &AuthenticatorModel{}
 
 type AuthenticatorModel struct {
@@ -10,18 +8,10 @@ type AuthenticatorModel struct {
 	Name   string
 }
 
-func (r AuthenticatorModel) MarshalJSON() ([]byte, error) {
-	return json.Marshal(r)
-}
-
-func (r AuthenticatorModel) UnmarshalJSON(b []byte) error {
-	return json.Unmarshal(b, r)
-}
-
-func (r AuthenticatorModel) Id() string {
+func (r *AuthenticatorModel) Id() string {
 	return r.AAGUID
 }
 
-func (r AuthenticatorModel) SetId(id string) {
+func (r *AuthenticatorModel) SetId(id string) {
 	r.AAGUID = id
 }

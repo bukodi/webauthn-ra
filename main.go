@@ -4,7 +4,7 @@ import (
 	"crypto/x509"
 	"embed"
 	"fmt"
-	"github.com/bukodi/webauthn-ra/pkg/app"
+	"github.com/bukodi/webauthn-ra/pkg/listeners"
 	"github.com/bukodi/webauthn-ra/pkg/openapi"
 	"github.com/fxamacker/webauthn"
 	"io/fs"
@@ -59,7 +59,7 @@ U9psmyPzK+Vsgw2jeRQ5JlKDyqE0hebfC1tvFu0CCrJFcw==
 -----END CERTIFICATE-----`
 
 func main() {
-	httpsSrv, err := app.NewHttpServer(":3000")
+	httpsSrv, err := listeners.NewHttpServer(":3000")
 
 	fs, err := fs.Sub(uiDistDir, "_ui/dist")
 	if err != nil {
@@ -70,12 +70,12 @@ func main() {
 	webauthn.AttestationStatementVerifyOptions.Roots = x509.NewCertPool()
 	webauthn.AttestationStatementVerifyOptions.Roots.AppendCertsFromPEM([]byte(pem_Yubico_U2F_Root_CA_Serial_457200631))
 
-	httpFsHandler, err := app.StaticHttpHandler("/app/", fs)
+	httpFsHandler, err := listeners.StaticHttpHandler("/listeners/", fs)
 	if err != nil {
 		panic(err)
 	}
-	httpsSrv.ServerMux.Handle("/app/", httpFsHandler)
-	log.Println("UI accessible on  http://localhost:3000/app")
+	httpsSrv.ServerMux.Handle("/listeners/", httpFsHandler)
+	log.Println("UI accessible on  http://localhost:3000/listeners")
 
 	httpsSrv.ServerMux.Handle("/api/v1/count", http.StripPrefix("/api/v1/", new(countHandler)))
 

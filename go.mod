@@ -13,6 +13,7 @@ require (
 	github.com/elgopher/yala v0.20.0
 	github.com/fxamacker/webauthn v0.6.1
 	github.com/knadh/koanf v1.4.0
+	github.com/oklog/ulid/v2 v2.0.2
 	github.com/rs/cors v1.8.2
 	gorm.io/driver/sqlite v1.2.6
 	gorm.io/gorm v1.22.5

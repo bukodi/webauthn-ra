@@ -56,4 +56,10 @@ https://fidoalliance.org/specs/fido-v2.0-rd-20180702/fido-server-v2.0-rd-2018070
 Icons:
 https://jossef.github.io/material-design-icons-iconfont/
 
+## Review of dependencies (TODO)
+### GORM
+### Chi router
+### Ulid
+### Koanf
+
 

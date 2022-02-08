@@ -1,0 +1,20 @@
+{
+  "database": {
+    "driver": "sqlite",
+    "dsn": "file::memory:"
+  },
+  "logging": {
+  },
+  "listeners": [
+    {
+      "name": "frontend",
+      "protocol": "https",
+      "address": "*:443",
+      "handlers": ["ui","api"]
+    },
+    {
+      "name": "ca-agent",
+      "protocol": "https"
+    }
+  ]
+}

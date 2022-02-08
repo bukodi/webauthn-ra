@@ -11,14 +11,18 @@ type Challenge struct {
 	AAGUID string
 }
 
-func (a Challenge) MarshalJSON() ([]byte, error) {
-	return json.Marshal(a)
+func (r Challenge) SetId(id string) {
+	r.Hash = id
 }
 
-func (a Challenge) UnmarshalJSON(b []byte) error {
-	return json.Unmarshal(b, a)
+func (r Challenge) MarshalJSON() ([]byte, error) {
+	return json.Marshal(r)
 }
 
-func (a Challenge) Id() string {
-	return a.Hash
+func (r Challenge) UnmarshalJSON(b []byte) error {
+	return json.Unmarshal(b, r)
+}
+
+func (r Challenge) Id() string {
+	return r.Hash
 }

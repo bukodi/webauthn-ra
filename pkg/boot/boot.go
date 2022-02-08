@@ -13,7 +13,7 @@ func Boot(ctx context.Context) error {
 	var err error
 
 	if ctx == nil {
-		ctx = context.TODO()
+		ctx = context.Background()
 	}
 
 	if err := config.Load(); err != nil {

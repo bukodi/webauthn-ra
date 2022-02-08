@@ -1,6 +1,7 @@
 package config
 
 import (
+	_ "embed"
 	"fmt"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/json"
@@ -14,6 +15,9 @@ var (
 )
 
 var FilePath string
+
+//go:embed default.json
+var DefaultJSON string
 
 func Load() error {
 

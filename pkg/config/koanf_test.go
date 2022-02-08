@@ -20,7 +20,7 @@ func TestDefault(t *testing.T) {
 	}
 
 	cfg := TestOpts{}
-	InitStruct(&cfg)
+	InitStruct("", &cfg)
 	t.Logf("Test opts: %+v", cfg)
 
 	json, _ := ExportJSON()

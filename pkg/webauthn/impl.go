@@ -9,31 +9,10 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"github.com/bukodi/webauthn-ra/pkg/errs"
+	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/bukodi/webauthn-ra/pkg/openapi"
 	"github.com/fxamacker/webauthn"
 )
-
-const pem_Yubico_U2F_Root_CA_Serial_457200631 = `
------BEGIN CERTIFICATE-----
-MIIDHjCCAgagAwIBAgIEG0BT9zANBgkqhkiG9w0BAQsFADAuMSwwKgYDVQQDEyNZ
-dWJpY28gVTJGIFJvb3QgQ0EgU2VyaWFsIDQ1NzIwMDYzMTAgFw0xNDA4MDEwMDAw
-MDBaGA8yMDUwMDkwNDAwMDAwMFowLjEsMCoGA1UEAxMjWXViaWNvIFUyRiBSb290
-IENBIFNlcmlhbCA0NTcyMDA2MzEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
-AoIBAQC/jwYuhBVlqaiYWEMsrWFisgJ+PtM91eSrpI4TK7U53mwCIawSDHy8vUmk
-5N2KAj9abvT9NP5SMS1hQi3usxoYGonXQgfO6ZXyUA9a+KAkqdFnBnlyugSeCOep
-8EdZFfsaRFtMjkwz5Gcz2Py4vIYvCdMHPtwaz0bVuzneueIEz6TnQjE63Rdt2zbw
-nebwTG5ZybeWSwbzy+BJ34ZHcUhPAY89yJQXuE0IzMZFcEBbPNRbWECRKgjq//qT
-9nmDOFVlSRCt2wiqPSzluwn+v+suQEBsUjTGMEd25tKXXTkNW21wIWbxeSyUoTXw
-LvGS6xlwQSgNpk2qXYwf8iXg7VWZAgMBAAGjQjBAMB0GA1UdDgQWBBQgIvz0bNGJ
-hjgpToksyKpP9xv9oDAPBgNVHRMECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAN
-BgkqhkiG9w0BAQsFAAOCAQEAjvjuOMDSa+JXFCLyBKsycXtBVZsJ4Ue3LbaEsPY4
-MYN/hIQ5ZM5p7EjfcnMG4CtYkNsfNHc0AhBLdq45rnT87q/6O3vUEtNMafbhU6kt
-hX7Y+9XFN9NpmYxr+ekVY5xOxi8h9JDIgoMP4VB1uS0aunL1IGqrNooL9mmFnL2k
-LVVee6/VR6C5+KSTCMCWppMuJIZII2v9o4dkoZ8Y7QRjQlLfYzd3qGtKbw7xaF1U
-sG/5xUb/Btwb2X2g4InpiB/yt/3CpQXpiWX/K4mBvUKiGn05ZsqeY1gx4g0xLBqc
-U9psmyPzK+Vsgw2jeRQ5JlKDyqE0hebfC1tvFu0CCrJFcw==
------END CERTIFICATE-----`
 
 // Declare input port type.
 type attestationResponse struct {
@@ -78,14 +57,14 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(in)
 	if err != nil {
-		return errs.Handle(ctx, err)
+		return errlog.Handle(ctx, err)
 	} else {
 		inputStr := buf.String()
 		fmt.Printf("Input: %s\n\n", inputStr)
 	}
 	pubKeyAtt, err := webauthn.ParseAttestation(bytes.NewReader(buf.Bytes()))
 	if err != nil {
-		return errs.Handle(ctx, err)
+		return errlog.Handle(ctx, err)
 	}
 
 	out.AuthenticatorGUID = hex.EncodeToString(pubKeyAtt.AuthnData.AAGUID)
@@ -97,7 +76,7 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 			pubKey := pubKeyAtt.AuthnData.Credential.PublicKey
 			pubKeyBytes, err := x509.MarshalPKIXPublicKey(pubKey)
 			if err != nil {
-				return errs.Handle(ctx, err)
+				return errlog.Handle(ctx, err)
 			} else {
 				pemBytes := pem.EncodeToMemory(&pem.Block{
 					Type:  "PUBLIC KEY",
@@ -111,7 +90,7 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 
 	sysPool, err := x509.SystemCertPool()
 	if err != nil {
-		return errs.Handle(ctx, err)
+		return errlog.Handle(ctx, err)
 	}
 	if !sysPool.AppendCertsFromPEM([]byte(pem_Yubico_U2F_Root_CA_Serial_457200631)) {
 		return fmt.Errorf("Can't YoubikeyRootCert")
@@ -120,7 +99,7 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 	var attExpectedData webauthn.AttestationExpectedData
 	attType, trustPath, err := webauthn.VerifyAttestation(pubKeyAtt, &attExpectedData)
 	if err != nil {
-		return errs.Handle(ctx, err)
+		return errlog.Handle(ctx, err)
 	} else {
 		fmt.Printf("attType: %s\n", attType.String())
 		fmt.Printf("trustPath: %+v\n", trustPath)
@@ -133,7 +112,7 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 
 		attType, trustPath, err := pubKeyAtt.VerifyAttestationStatement()
 		if err != nil {
-			return errs.Handle(ctx, err)
+			return errlog.Handle(ctx, err)
 		} else {
 			fmt.Printf("attType: %s\n", attType.String())
 			fmt.Printf("trustPath: %+v\n", trustPath)

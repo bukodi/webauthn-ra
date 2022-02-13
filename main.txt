@@ -1,0 +1,55 @@
+package root
+
+import (
+	"embed"
+	"github.com/bukodi/webauthn-ra/pkg/listeners"
+	"github.com/bukodi/webauthn-ra/pkg/openapi"
+	_ "github.com/bukodi/webauthn-ra/pkg/webauthn"
+	"io/fs"
+	"log"
+	"net/http"
+)
+
+const allowDev = true
+
+//go:embed _ui/dist
+var UiDistDir embed.FS
+
+//go:embed test/articles.json
+var articlesJson []byte
+
+func main() {
+	httpsSrv, err := listeners.NewHttpServer(":3000")
+
+	fs, err := fs.Sub(UiDistDir, "_ui/dist")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	httpFsHandler, err := listeners.StaticHttpHandler("/app/", fs)
+	if err != nil {
+		panic(err)
+	}
+	httpsSrv.ServerMux.Handle("/app/", httpFsHandler)
+	log.Println("UI accessible on  http://localhost:3000/app")
+
+	httpsSrv.ServerMux.Handle("/api/v1/articles", http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		if allowDev {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(articlesJson)
+	}))
+
+	apiHandler, err := openapi.ApiRouter("/api/v1")
+	if err != nil {
+		log.Fatal(err)
+	}
+	httpsSrv.ServerMux.Handle("/", apiHandler)
+	log.Println("API accessible on  http://localhost:3000/api/v1/docs")
+
+	err = httpsSrv.ListenAndServe()
+	if err != nil {
+		log.Fatal(err)
+	}
+}

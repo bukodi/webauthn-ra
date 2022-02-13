@@ -1,6 +1,7 @@
 package listeners
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"github.com/rs/cors"
@@ -10,7 +11,7 @@ import (
 
 type HttpServer struct {
 	http.Server
-	ServerMux *http.ServeMux
+	serverMux *http.ServeMux
 }
 
 func NewHttpServer(address string) (*HttpServer, error) {
@@ -61,7 +62,19 @@ func NewHttpServer(address string) (*HttpServer, error) {
 			BaseContext:       nil,
 			ConnContext:       nil,
 		},
-		ServerMux: serverMux,
+		serverMux: serverMux,
 	}
 	return &srv, nil
+}
+
+func (srv HttpServer) ListenAndServe() error {
+	return srv.Server.ListenAndServe()
+}
+
+func (srv HttpServer) Shutdown(ctx context.Context) error {
+	return srv.Server.Shutdown(ctx)
+}
+
+func (srv HttpServer) Handle(pattern string, handler http.Handler) {
+	srv.serverMux.Handle(pattern, handler)
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto"
 	"fmt"
-	"github.com/bukodi/webauthn-ra/pkg/errs"
+	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"gorm.io/gorm"
 )
 
@@ -20,7 +20,7 @@ type writeTx struct {
 func ExecuteInWriteTx(ctx context.Context, signer crypto.Signer, fn func(ctx context.Context) error) error {
 	_, ok := ctx.Value(writeTxKey).(*writeTx)
 	if ok {
-		return errs.Handle(ctx, fmt.Errorf("already in a write transaction"))
+		return errlog.Handle(ctx, fmt.Errorf("already in a write transaction"))
 	}
 
 	dbTx := dbInstance.Begin()
@@ -31,7 +31,7 @@ func ExecuteInWriteTx(ctx context.Context, signer crypto.Signer, fn func(ctx con
 	}()
 
 	if err := dbTx.Error; err != nil {
-		return errs.Handle(ctx, err)
+		return errlog.Handle(ctx, err)
 	}
 
 	var writeTx = writeTx{
@@ -42,16 +42,16 @@ func ExecuteInWriteTx(ctx context.Context, signer crypto.Signer, fn func(ctx con
 	err := fn(ctx2)
 	if err != nil {
 		dbTx.Rollback()
-		return errs.Handle(ctx, err)
+		return errlog.Handle(ctx, err)
 	} else {
-		return errs.Handle(ctx, dbTx.Commit().Error)
+		return errlog.Handle(ctx, dbTx.Commit().Error)
 	}
 }
 
 func RequiresWriteTx(ctx context.Context) (*gorm.DB, error) {
 	writeTx, ok := ctx.Value(writeTxKey).(*writeTx)
 	if !ok {
-		return nil, errs.Handle(ctx, fmt.Errorf("not in a write transaction"))
+		return nil, errlog.Handle(ctx, fmt.Errorf("not in a write transaction"))
 	}
 	return writeTx.writeTx, nil
 }

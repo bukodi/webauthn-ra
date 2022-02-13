@@ -2,7 +2,7 @@ package repo
 
 import (
 	"context"
-	"github.com/bukodi/webauthn-ra/pkg/errs"
+	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/bukodi/webauthn-ra/pkg/model"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -25,12 +25,12 @@ func Init(ctx context.Context, cfg *Config) error {
 	if cfg.Driver == "sqlite" {
 		dialector = sqlite.Open(cfg.Dsn)
 	} else {
-		return errs.Handle(ctx, &ErrUnsupportedDriver{driver: cfg.Driver})
+		return errlog.Handle(ctx, &ErrUnsupportedDriver{driver: cfg.Driver})
 	}
 
 	db, err := gorm.Open(dialector, &gormCfg)
 	if err != nil {
-		return errs.Handle(ctx, err)
+		return errlog.Handle(ctx, err)
 	}
 	dbInstance = db
 
@@ -40,5 +40,5 @@ func Init(ctx context.Context, cfg *Config) error {
 func RegisterType[R model.Record]() error {
 	var r R
 	err := dbInstance.AutoMigrate(&r)
-	return errs.Handle(nil, err)
+	return errlog.Handle(nil, err)
 }

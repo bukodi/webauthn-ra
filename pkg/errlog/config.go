@@ -1,4 +1,4 @@
-package errs
+package errlog
 
 type Config struct {
 	driver string

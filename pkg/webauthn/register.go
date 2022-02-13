@@ -2,7 +2,7 @@ package webauthn
 
 import (
 	"context"
-	"github.com/bukodi/webauthn-ra/pkg/errs"
+	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/bukodi/webauthn-ra/pkg/openapi"
 	"github.com/swaggest/usecase"
 	"net/http"
@@ -23,7 +23,7 @@ func AttestationOptionsREST() usecase.IOInteractor {
 		if err != nil {
 			out.Status = "failed"
 			out.ErrorMessage = err.Error()
-			errs.LogError(ctx, err)
+			errlog.LogError(ctx, err)
 		} else {
 			out.Status = "ok"
 		}
@@ -42,7 +42,7 @@ func AttestationResultREST() usecase.IOInteractor {
 		if err != nil {
 			out.Status = "failed"
 			out.ErrorMessage = err.Error()
-			errs.LogError(ctx, err)
+			errlog.LogError(ctx, err)
 		} else {
 			out.Status = "ok"
 		}

@@ -5,6 +5,11 @@
   },
   "logging": {
   },
+  "webauthn": {
+    "rpName": "webauthn-ra",
+    "rpId": "localhost",
+    "createCredentialTimeoutInSec": 60
+  },
   "listeners": [
     {
       "name": "frontend",

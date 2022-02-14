@@ -7,6 +7,7 @@ import (
 	"github.com/bukodi/webauthn-ra/pkg/listeners"
 	"github.com/bukodi/webauthn-ra/pkg/openapi"
 	"github.com/bukodi/webauthn-ra/pkg/repo"
+	"github.com/bukodi/webauthn-ra/pkg/webauthn"
 )
 
 const cfgPathDatabase = "database"
@@ -31,7 +32,7 @@ func Boot(ctx context.Context) error {
 		return errlog.Handle(ctx, err)
 	}
 
-	if err = repo.RegisterTypes(); err != nil {
+	if err := webauthn.Init(ctx, webauthn.Config{}); err != nil {
 		return errlog.Handle(ctx, err)
 	}
 

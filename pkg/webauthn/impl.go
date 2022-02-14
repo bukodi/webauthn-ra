@@ -3,6 +3,7 @@ package webauthn
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
@@ -39,18 +40,32 @@ type registerAuthenticatorOutput struct {
 	AttestnCertIssuerCN  string `json:"attestnCertIssuerCN,omitempty"`
 }
 
-type ServerPublicKeyCredentialCreationOptionsRequest struct {
-	UserName string `json:"userName,omitempty"`
-}
+func GetAttestationOptions(ctx context.Context, authenticatorType webauthn.AuthenticatorAttachment) (jsonOptions string, fullChallenge []byte, err error) {
+	timeout := fmt.Sprintf("%d", int(config.CreateCredentialTimeout.Seconds()))
+	fullChallenge = []byte("123456")
+	h := sha256.Sum256(fullChallenge)
+	challengeHash := hex.EncodeToString(h[:])
+	template := `{
+		challenge: "` + challengeHash + `",
+	  	rp: {
+			name: "` + config.RpName + `",
+			id  : "` + config.RpId + `"
+		},
+		user: {
+			id: new Uint8Array(16),
+			name: "jdoe@example.com",
+			displayName: "John Doe"
+		},
+		attestation: ` + timeout + `,
+		authenticatorSelection: {
+        	residentKey: false,
+        	authenticatorAttachment: 'cross-platform',
+        	userVerification: 'preferred'
+		},
+		attestation: 'direct'
+    }`
 
-type ServerPublicKeyCredentialCreationOptionsResponse struct {
-	openapi.ServerResponse
-	Challenge string `json:"challenge,omitempty"`
-}
-
-func GetAttestationOptions(ctx context.Context, in *ServerPublicKeyCredentialCreationOptionsRequest, out *ServerPublicKeyCredentialCreationOptionsResponse) error {
-	out.Challenge = "uhUjPNlZfvn7onwuhNdsLPkkE5Fv-lUN"
-	return nil
+	return template, fullChallenge, nil
 }
 
 func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, out *registerAuthenticatorOutput) error {
@@ -67,6 +82,8 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 		return errlog.Handle(ctx, err)
 	}
 
+	auth := Authenticator{}
+	_ = auth
 	out.AuthenticatorGUID = hex.EncodeToString(pubKeyAtt.AuthnData.AAGUID)
 	out.AuthenticatorType = "Unknown type"
 	if pubKeyAtt.AuthnData != nil {

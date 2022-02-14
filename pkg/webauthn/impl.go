@@ -40,32 +40,32 @@ type registerAuthenticatorOutput struct {
 	AttestnCertIssuerCN  string `json:"attestnCertIssuerCN,omitempty"`
 }
 
-func GetAttestationOptions(ctx context.Context, authenticatorType webauthn.AuthenticatorAttachment) (jsonOptions string, fullChallenge []byte, err error) {
-	timeout := fmt.Sprintf("%d", int(config.CreateCredentialTimeout.Seconds()))
+func GetAttestationOptions(ctx context.Context, authenticatorType webauthn.AuthenticatorAttachment) (ccOptions map[string]interface{}, fullChallenge []byte, err error) {
 	fullChallenge = []byte("123456")
 	h := sha256.Sum256(fullChallenge)
 	challengeHash := hex.EncodeToString(h[:])
-	template := `{
-		challenge: "` + challengeHash + `",
-	  	rp: {
-			name: "` + config.RpName + `",
-			id  : "` + config.RpId + `"
-		},
-		user: {
-			id: new Uint8Array(16),
-			name: "jdoe@example.com",
-			displayName: "John Doe"
-		},
-		attestation: ` + timeout + `,
-		authenticatorSelection: {
-        	residentKey: false,
-        	authenticatorAttachment: 'cross-platform',
-        	userVerification: 'preferred'
-		},
-		attestation: 'direct'
-    }`
 
-	return template, fullChallenge, nil
+	ccOptions = map[string]interface{}{
+		"challenge": challengeHash,
+		"rp": map[string]interface{}{
+			"name": config.RpName,
+			"id":   config.RpId,
+		},
+		"user": map[string]interface{}{
+			"id":          "123456",
+			"name":        "jdoe@example.com",
+			"displayName": "John Doe",
+		},
+		"timeout": fmt.Sprintf("%d", int(config.CreateCredentialTimeout.Seconds())),
+		"authenticatorSelection": map[string]interface{}{
+			"residentKey":             false,
+			"authenticatorAttachment": string(authenticatorType),
+			"userVerification":        "preferred",
+		},
+		"attestation": "direct",
+	}
+
+	return ccOptions, fullChallenge, nil
 }
 
 func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, out *registerAuthenticatorOutput) error {

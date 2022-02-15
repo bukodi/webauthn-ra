@@ -40,24 +40,24 @@ type registerAuthenticatorOutput struct {
 	AttestnCertIssuerCN  string `json:"attestnCertIssuerCN,omitempty"`
 }
 
-func GetAttestationOptions(ctx context.Context, authenticatorType webauthn.AuthenticatorAttachment) (ccOptions map[string]interface{}, fullChallenge []byte, err error) {
+func GetAttestationOptions(ctx context.Context, authenticatorType webauthn.AuthenticatorAttachment) (ccOptions map[string]any, fullChallenge []byte, err error) {
 	fullChallenge = []byte("123456")
 	h := sha256.Sum256(fullChallenge)
 	challengeHash := hex.EncodeToString(h[:])
 
-	ccOptions = map[string]interface{}{
+	ccOptions = map[string]any{
 		"challenge": challengeHash,
-		"rp": map[string]interface{}{
+		"rp": map[string]any{
 			"name": config.RpName,
 			"id":   config.RpId,
 		},
-		"user": map[string]interface{}{
+		"user": map[string]any{
 			"id":          "123456",
 			"name":        "jdoe@example.com",
 			"displayName": "John Doe",
 		},
 		"timeout": fmt.Sprintf("%d", int(config.CreateCredentialTimeout.Seconds())),
-		"authenticatorSelection": map[string]interface{}{
+		"authenticatorSelection": map[string]any{
 			"residentKey":             false,
 			"authenticatorAttachment": string(authenticatorType),
 			"userVerification":        "preferred",

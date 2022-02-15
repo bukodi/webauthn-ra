@@ -23,8 +23,8 @@ func AttestationOptionsREST() usecase.IOInteractor {
 
 	type responseType struct {
 		openapi.ServerResponse
-		FullChallenge             []byte                 `json:"fullChallenge,omitempty"`
-		CredentialCreationOptions map[string]interface{} `json:"credentialCreationOptions,omitempty"`
+		FullChallenge             []byte         `json:"fullChallenge,omitempty"`
+		CredentialCreationOptions map[string]any `json:"credentialCreationOptions,omitempty"`
 	}
 
 	u := usecase.NewIOI(new(requestType), new(responseType), func(ctx context.Context, input, output interface{}) error {

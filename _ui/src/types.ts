@@ -20,10 +20,12 @@ export interface ParsedAttestation {
   attestnCertIssuerCN?: string;
 }
 
-export interface ServerPublicKeyCredentialCreationOptionsResponse {
+export interface WebauthnOptionsResponse {
   status: string;
   errorMessage: string;
   challenge: string;
+  fullChallenge: string;
+  credentialCreationOptions: any;
 }
 
 export enum ArticleType {

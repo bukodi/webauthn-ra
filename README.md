@@ -22,10 +22,11 @@ Then open http://localhost:8080/dev
 
 ## Used technologies
 - UI written in Vuetify with Typescript
-- Built-in webserver
+- Built-in webserver with automatic certificate management
 - Webauthn
 - OpenAPI V3 (swaggest)
 - GORM
+- Code generation (Go->TypeScript)
 
 ## Data domains:
 ### Audit log

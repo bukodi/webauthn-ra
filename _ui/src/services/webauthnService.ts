@@ -1,44 +1,30 @@
-import { ParsedAttestation, ServerPublicKeyCredentialCreationOptionsResponse } from '@/types';
+import { ParsedAttestation, WebauthnOptionsResponse } from '@/types';
+import { arrayBufferToBase64, BaseResponse } from '@/services/servicesBase';
 
-function arrayBufferToBase64 (buffer: ArrayBuffer): string {
-  let binary = '';
-  const bytes = new Uint8Array(buffer);
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return window.btoa(binary);
+export interface AuthenticatorOptionsRequest {
+  authenticatorAttachment: string;
+}
+
+export interface AuthenticatorOptionsResponse extends BaseResponse {
+  credentialCreationOptions: any;
+  fullChallenge: string;
 }
 
 class WebauthnService {
-  attestationOptions (type: AuthenticatorAttachment): Promise<PublicKeyCredentialCreationOptions | null> {
-    const bodyStr = JSON.stringify({
-      username: 'johndoe@example.com',
-      displayName: 'John Doe',
-      authenticatorSelection: {
-        residentKey: false,
-        authenticatorAttachment: 'cross-platform',
-        userVerification: 'preferred'
-      },
-      attestation: 'direct'
-    });
-
-    return fetch(process.env.VUE_APP_SERVER_API_URL + '/authenticator/options', {
+  authenticatorOptions (req: AuthenticatorOptionsRequest): Promise<AuthenticatorOptionsResponse> {
+    return fetch(process.env.VUE_APP_SERVER_API_URL + '/webauthn/authenticator/options', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: bodyStr
+      body: JSON.stringify(req)
     })
-      .then((response) => {
-        return response.json();
+      .then(response => {
+        const data = response.json();
+        return (data as unknown) as AuthenticatorOptionsResponse;
       })
-      .then((response) => {
-        const obj = response as ServerPublicKeyCredentialCreationOptionsResponse;
-        return {} as PublicKeyCredentialCreationOptions;
-      })
-      .catch((e) => {
-        console.error('An error occurred register authenticator', e);
-        return null;
+      .catch(e => {
+        throw e;
       });
   }
 
@@ -59,7 +45,7 @@ class WebauthnService {
     });
     console.log('Request body: ' + bodyStr);
 
-    return fetch(process.env.VUE_APP_SERVER_API_URL + '/authenticator/register', {
+    return fetch(process.env.VUE_APP_SERVER_API_URL + '/webauthn/authenticator/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

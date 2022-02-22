@@ -3,7 +3,7 @@ package webauthn
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
+	"crypto/rand"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
@@ -40,32 +40,47 @@ type registerAuthenticatorOutput struct {
 	AttestnCertIssuerCN  string `json:"attestnCertIssuerCN,omitempty"`
 }
 
-func GetAttestationOptions(ctx context.Context, authenticatorType webauthn.AuthenticatorAttachment) (ccOptions map[string]any, fullChallenge []byte, err error) {
+func GetAttestationOptions(ctx context.Context, authenticatorType webauthn.AuthenticatorAttachment) (ccOptions *webauthn.PublicKeyCredentialCreationOptions, fullChallenge []byte, err error) {
+	var userId []byte = make([]byte, 64)
+	if _, err := rand.Read(userId); err != nil {
+		return nil, nil, errlog.Handle(ctx, err)
+	}
 	fullChallenge = []byte("123456")
-	h := sha256.Sum256(fullChallenge)
-	challengeHash := hex.EncodeToString(h[:])
+	//challengeHash := sha256.Sum256(fullChallenge)
+	challengeHash := fullChallenge
 
-	ccOptions = map[string]any{
-		"challenge": challengeHash,
-		"rp": map[string]any{
-			"name": config.RpName,
-			"id":   config.RpId,
+	pkcco := webauthn.PublicKeyCredentialCreationOptions{
+		Challenge: challengeHash[:],
+		RP: webauthn.PublicKeyCredentialRpEntity{
+			Name: config.RpName,
+			ID:   config.RpId,
 		},
-		"user": map[string]any{
-			"id":          "123456",
-			"name":        "jdoe@example.com",
-			"displayName": "John Doe",
+		User: webauthn.PublicKeyCredentialUserEntity{
+			ID:          userId,
+			Name:        "jdoe@example.com",
+			DisplayName: "John Doe",
 		},
-		"timeout": fmt.Sprintf("%d", int(config.CreateCredentialTimeout.Seconds())),
-		"authenticatorSelection": map[string]any{
-			"residentKey":             false,
-			"authenticatorAttachment": string(authenticatorType),
-			"userVerification":        "preferred",
+		Timeout: uint64(config.CreateCredentialTimeout.Seconds()),
+		AuthenticatorSelection: webauthn.AuthenticatorSelectionCriteria{
+			AuthenticatorAttachment: authenticatorType,
+			ResidentKey:             webauthn.ResidentKeyRequired,
+			UserVerification:        webauthn.UserVerificationRequired,
 		},
-		"attestation": "direct",
+		Attestation: webauthn.AttestationDirect,
+		// See: https://www.w3.org/TR/webauthn-3/#typedefdef-cosealgorithmidentifier
+		PubKeyCredParams: []webauthn.PublicKeyCredentialParameters{
+			{
+				Type: webauthn.PublicKeyCredentialTypePublicKey,
+				Alg:  -7, // ES256
+			},
+			{
+				Type: webauthn.PublicKeyCredentialTypePublicKey,
+				Alg:  -257, // RS256
+			},
+		},
 	}
 
-	return ccOptions, fullChallenge, nil
+	return &pkcco, fullChallenge, nil
 }
 
 func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, out *registerAuthenticatorOutput) error {

@@ -2,9 +2,9 @@
   <div>
     <TopToolbar></TopToolbar>
     <v-container fill-height>
-      <v-row justify="center" align="center">
+      <v-row align="center" justify="center">
         <v-col cols="12" sm="4">
-          <v-card dark class="mx-auto" color="primary" >
+          <v-card class="mx-auto" color="primary" dark>
             <v-card-title>
               <v-icon large right>settings_remote</v-icon>
               <span class="font-weight-bold">Roaming authenticator</span>
@@ -27,7 +27,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import TopToolbar from '../components/TopToolbar.vue';
-import webauthnService from '@/services/webauthnService';
+import webauthnService, { AuthenticatorOptionsRequest } from '@/services/webauthnService';
+import { base64ToArrayBuffer } from '@/services/servicesBase';
 
 @Component({
   components: {
@@ -47,44 +48,55 @@ export default class RegisterFIDO extends Vue {
     this.startRegister('cross-platform');
   }
 
+  webauthnAttestationOptions (type: AuthenticatorAttachment): Promise<{ opts: PublicKeyCredentialCreationOptions; fc: string }> {
+    const req = {
+      authenticatorAttachment: type
+    } as AuthenticatorOptionsRequest;
+
+    return webauthnService.authenticatorOptions(req)
+      .then(resp => {
+        console.log('Before conversion: ', resp);
+        const opts = resp.credentialCreationOptions;
+
+        const pkcco: PublicKeyCredentialCreationOptions = {
+          challenge: base64ToArrayBuffer(opts.challenge),
+          rp: opts.rp as PublicKeyCredentialRpEntity,
+          user: {
+            id: base64ToArrayBuffer(opts.user.id),
+            name: opts.user.name,
+            displayName: opts.user.displayName
+          } as PublicKeyCredentialUserEntity,
+          timeout: opts.timeout,
+          authenticatorSelection: opts.authenticatorSelection,
+          attestation: opts.attestation,
+          pubKeyCredParams: opts.pubKeyCredParams
+        };
+        console.log('After conversion: ', pkcco);
+        return {
+          opts: pkcco,
+          fc: resp.fullChallenge
+        };
+      });
+  }
+
   startRegister (type: string) {
     const aa = type as AuthenticatorAttachment;
     console.log('register clicked:' + aa);
-    navigator.credentials.create({
-      publicKey: {
-        rp: {
-          name: 'localhost'
-        },
-        user: {
-          id: new Uint8Array([1, 2]),
-          name: 'test',
-          displayName: 'test'
-        },
-        challenge: new Uint8Array([21, 31]),
-        pubKeyCredParams: [
-          // See: https://www.w3.org/TR/webauthn-3/#typedefdef-cosealgorithmidentifier
-          {
-            type: 'public-key',
-            alg: -7 // ES256
-          },
-          {
-            type: 'public-key',
-            alg: -257 // RS256
-          }
-        ],
-        attestation: 'indirect',
-        authenticatorSelection: {
-          authenticatorAttachment: 'cross-platform'
+
+    this.webauthnAttestationOptions('cross-platform').then(ret => {
+      const opts: CredentialCreationOptions = {
+        publicKey: ret.opts
+      };
+      navigator.credentials.create(opts).then(value => {
+        if (value == null) {
+          console.log('null returned.');
+          return;
         }
-      }
-    }).then(value => {
-      if (value == null) {
-        console.log('null returned.');
-        return;
-      }
-      this.dumpCread(value);
-    }).catch(error => {
-      console.log('rejected', error);
+        this.dumpCread(value);
+      });
+    }
+    ).catch(err => {
+      console.log('rejected', err, err.stack);
     });
   }
 
@@ -107,4 +119,5 @@ export default class RegisterFIDO extends Vue {
     });
   }
 }
+
 </script>

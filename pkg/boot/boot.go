@@ -27,12 +27,15 @@ func Boot(ctx context.Context) error {
 	if err := config.InitStruct(cfgPathDatabase, &dbOpts); err != nil {
 		return errlog.Handle(ctx, err)
 	}
-	err = repo.Init(ctx, &dbOpts)
-	if err != nil {
+	if err = repo.Init(ctx, &dbOpts); err != nil {
 		return errlog.Handle(ctx, err)
 	}
 
-	if err := webauthn.Init(ctx, webauthn.Config{}); err != nil {
+	var webauthnOpts webauthn.Config
+	if err := config.InitStruct("webauthn", &webauthnOpts); err != nil {
+		return errlog.Handle(ctx, err)
+	}
+	if err = webauthn.Init(ctx, &webauthnOpts); err != nil {
 		return errlog.Handle(ctx, err)
 	}
 

@@ -11,26 +11,26 @@ import (
 )
 
 func init() {
-	openapi.AddUseCase(http.MethodPost, "/webauthn/authenticator/options", AttestationOptionsREST())
+	openapi.AddUseCase(http.MethodPost, "/webauthn/authenticator/options", AuthenticatorOptionsREST())
 	openapi.AddUseCase(http.MethodPost, "/webauthn/authenticator/register", AttestationResultREST())
 }
 
-func AttestationOptionsREST() usecase.IOInteractor {
+func AuthenticatorOptionsREST() usecase.IOInteractor {
 
-	type requestType struct {
+	type AuthenticatorOptionsRequest struct {
 		AuthenticatorAttachment string `json:"authenticatorAttachment,omitempty"`
 	}
 
-	type responseType struct {
+	type AuthenticatorOptionsResponse struct {
 		openapi.ServerResponse
-		FullChallenge             []byte         `json:"fullChallenge,omitempty"`
-		CredentialCreationOptions map[string]any `json:"credentialCreationOptions,omitempty"`
+		FullChallenge             []byte                                       `json:"fullChallenge"`
+		CredentialCreationOptions *webauthn.PublicKeyCredentialCreationOptions `json:"credentialCreationOptions"`
 	}
 
-	u := usecase.NewIOI(new(requestType), new(responseType), func(ctx context.Context, input, output interface{}) error {
+	u := usecase.NewIOI(new(AuthenticatorOptionsRequest), new(AuthenticatorOptionsResponse), func(ctx context.Context, input, output interface{}) error {
 		var (
-			in  = input.(*requestType)
-			out = output.(*responseType)
+			in  = input.(*AuthenticatorOptionsRequest)
+			out = output.(*AuthenticatorOptionsResponse)
 		)
 
 		var aatch webauthn.AuthenticatorAttachment
@@ -46,11 +46,10 @@ func AttestationOptionsREST() usecase.IOInteractor {
 
 		ccOptions, fullChallenge, err := GetAttestationOptions(ctx, aatch)
 		if err != nil {
-			out.Status = "failed"
 			out.ErrorMessage = err.Error()
+			// TODO: add errorId
 			errlog.LogError(ctx, err)
 		} else {
-			out.Status = "ok"
 			out.CredentialCreationOptions = ccOptions
 			out.FullChallenge = fullChallenge
 		}
@@ -67,11 +66,8 @@ func AttestationResultREST() usecase.IOInteractor {
 		)
 		err := RegisterAuthenticator(ctx, in, out)
 		if err != nil {
-			out.Status = "failed"
 			out.ErrorMessage = err.Error()
 			errlog.LogError(ctx, err)
-		} else {
-			out.Status = "ok"
 		}
 		return nil
 	})

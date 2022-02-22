@@ -14,9 +14,10 @@ type Config struct {
 	CreateCredentialTimeout time.Duration
 }
 
-var config Config
+var config *Config
 
-func Init(ctx context.Context, cfg Config) error {
+func Init(ctx context.Context, cfg *Config) error {
+	config = cfg
 	if err := repo.RegisterType[*model.AuthenticatorModel](); err != nil {
 		return errlog.Handle(nil, err)
 	}

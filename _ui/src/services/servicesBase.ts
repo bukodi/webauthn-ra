@@ -8,13 +8,19 @@ export function arrayBufferToBase64 (buffer: ArrayBuffer): string {
 }
 
 export function base64ToArrayBuffer (b64: string): Uint8Array {
-  console.log('Base64Input: >' + b64 + '<');
-  const raw1 = decodeURI(b64);
-  console.log('URLDecoded: >' + b64 + '<');
-  const raw = atob(b64);
-  console.log('Raw: ', raw);
+  // Replace non-url compatible chars with base64 standard chars
+  let input = b64.replace(/-/g, '+').replace(/_/g, '/');
+
+  // Pad out with standard base64 required padding characters
+  const pad = input.length % 4;
+  if (pad) {
+    if (pad === 1) {
+      throw new Error('InvalidLengthError: Input base64url string is the wrong length to determine padding');
+    }
+    input += new Array(5 - pad).join('=');
+  }
+  const raw = atob(input);
   const array = new Uint8Array(new ArrayBuffer(raw.length));
-  console.log('Array: ', array);
 
   for (let i = 0; i < raw.length; i++) {
     array[i] = raw.charCodeAt(i);

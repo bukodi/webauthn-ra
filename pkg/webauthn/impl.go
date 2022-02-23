@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
@@ -46,8 +47,7 @@ func GetAttestationOptions(ctx context.Context, authenticatorType webauthn.Authe
 		return nil, nil, errlog.Handle(ctx, err)
 	}
 	fullChallenge = []byte("123456")
-	//challengeHash := sha256.Sum256(fullChallenge)
-	challengeHash := fullChallenge
+	challengeHash := sha256.Sum256(fullChallenge)
 
 	pkcco := webauthn.PublicKeyCredentialCreationOptions{
 		Challenge: challengeHash[:],

@@ -1,7 +1,10 @@
 package webauthn
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/bukodi/webauthn-ra/pkg/openapi"
 	"github.com/fxamacker/webauthn"
@@ -12,7 +15,7 @@ import (
 
 func init() {
 	openapi.AddUseCase(http.MethodPost, "/webauthn/authenticator/options", AuthenticatorOptionsREST())
-	openapi.AddUseCase(http.MethodPost, "/webauthn/authenticator/register", AttestationResultREST())
+	openapi.AddUseCase(http.MethodPost, "/webauthn/authenticator/register", AuthenticatorRegisterREST())
 }
 
 func AuthenticatorOptionsREST() usecase.IOInteractor {
@@ -58,17 +61,47 @@ func AuthenticatorOptionsREST() usecase.IOInteractor {
 	return u
 }
 
-func AttestationResultREST() usecase.IOInteractor {
-	u := usecase.NewIOI(new(registerAuthenticatorInput), new(registerAuthenticatorOutput), func(ctx context.Context, input, output interface{}) error {
+func AuthenticatorRegisterREST() usecase.IOInteractor {
+
+	type AuthenticatorRegisterRequest struct {
+		Response      map[string]any `json:"response"`
+		FullChallenge string         `json:"fullChallenge"`
+	}
+
+	type AuthenticatorRegisterResponse struct {
+		openapi.ServerResponse
+		PublicKeyAlg         string `json:"publicKeyAlg,omitempty"`
+		PublicKeyPEM         string `json:"publicKeyPEM,omitempty"`
+		AuthenticatorGUID    string `json:"authenticatorGUID,omitempty"`
+		AuthenticatorType    string `json:"authenticatorType,omitempty"`
+		UserPresent          bool   `json:"userPresent,omitempty"`
+		UserVerified         bool   `json:"userVerified,omitempty"`
+		AttestnCertSubjectCN string `json:"attestnCertSubjectCN,omitempty"`
+		AttestnCertIssuerCN  string `json:"attestnCertIssuerCN,omitempty"`
+	}
+
+	u := usecase.NewIOI(new(AuthenticatorRegisterRequest), new(AuthenticatorRegisterResponse), func(ctx context.Context, input, output interface{}) error {
 		var (
-			in  = input.(*registerAuthenticatorInput)
-			out = output.(*registerAuthenticatorOutput)
+			in  = input.(*AuthenticatorRegisterRequest)
+			out = output.(*AuthenticatorRegisterResponse)
 		)
-		err := RegisterAuthenticator(ctx, in, out)
+
+		var buf bytes.Buffer
+		err := json.NewEncoder(&buf).Encode(in)
 		if err != nil {
 			out.ErrorMessage = err.Error()
 			errlog.LogError(ctx, err)
+			return nil
+		} else {
+			inputStr := buf.String()
+			fmt.Printf("Input: %s\n\n", inputStr)
 		}
+
+		/*err := RegisterAuthenticator(ctx, in, out)
+		if err != nil {
+			out.ErrorMessage = err.Error()
+			errlog.LogError(ctx, err)
+		}*/
 		return nil
 	})
 	return u

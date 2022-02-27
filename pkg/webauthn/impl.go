@@ -7,9 +7,6 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
-	"encoding/hex"
-	"encoding/json"
-	"encoding/pem"
 	"fmt"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/bukodi/webauthn-ra/pkg/openapi"
@@ -63,8 +60,8 @@ func GetAttestationOptions(ctx context.Context, authenticatorType webauthn.Authe
 		Timeout: uint64(config.CreateCredentialTimeout.Seconds()),
 		AuthenticatorSelection: webauthn.AuthenticatorSelectionCriteria{
 			AuthenticatorAttachment: authenticatorType,
-			ResidentKey:             webauthn.ResidentKeyRequired,
-			UserVerification:        webauthn.UserVerificationRequired,
+			//ResidentKey:             webauthn.ResidentKeyRequired,
+			//UserVerification:        webauthn.UserVerificationRequired,
 		},
 		Attestation: webauthn.AttestationDirect,
 		// See: https://www.w3.org/TR/webauthn-3/#typedefdef-cosealgorithmidentifier
@@ -83,23 +80,15 @@ func GetAttestationOptions(ctx context.Context, authenticatorType webauthn.Authe
 	return &pkcco, fullChallenge, nil
 }
 
-func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, out *registerAuthenticatorOutput) error {
-	var buf bytes.Buffer
-	err := json.NewEncoder(&buf).Encode(in)
+func RegisterAuthenticator(ctx context.Context, attestationBytes []byte, fullChallenge []byte) (*Authenticator, error) {
+	pubKeyAtt, err := webauthn.ParseAttestation(bytes.NewReader(attestationBytes))
 	if err != nil {
-		return errlog.Handle(ctx, err)
-	} else {
-		inputStr := buf.String()
-		fmt.Printf("Input: %s\n\n", inputStr)
-	}
-	pubKeyAtt, err := webauthn.ParseAttestation(bytes.NewReader(buf.Bytes()))
-	if err != nil {
-		return errlog.Handle(ctx, err)
+		return nil, errlog.Handle(ctx, err)
 	}
 
 	auth := Authenticator{}
 	_ = auth
-	out.AuthenticatorGUID = hex.EncodeToString(pubKeyAtt.AuthnData.AAGUID)
+	/*out.AuthenticatorGUID = hex.EncodeToString(pubKeyAtt.AuthnData.AAGUID)
 	out.AuthenticatorType = "Unknown type"
 	if pubKeyAtt.AuthnData != nil {
 		out.UserPresent = pubKeyAtt.AuthnData.UserPresent
@@ -118,20 +107,20 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 			}
 		}
 
-	}
+	}*/
 
 	sysPool, err := x509.SystemCertPool()
 	if err != nil {
-		return errlog.Handle(ctx, err)
+		return nil, errlog.Handle(ctx, err)
 	}
 	if !sysPool.AppendCertsFromPEM([]byte(pem_Yubico_U2F_Root_CA_Serial_457200631)) {
-		return fmt.Errorf("Can't YoubikeyRootCert")
+		return nil, fmt.Errorf("Can't YoubikeyRootCert")
 	}
 
 	var attExpectedData webauthn.AttestationExpectedData
 	attType, trustPath, err := webauthn.VerifyAttestation(pubKeyAtt, &attExpectedData)
 	if err != nil {
-		return errlog.Handle(ctx, err)
+		return nil, errlog.Handle(ctx, err)
 	} else {
 		fmt.Printf("attType: %s\n", attType.String())
 		fmt.Printf("trustPath: %+v\n", trustPath)
@@ -144,11 +133,11 @@ func RegisterAuthenticator(ctx context.Context, in *registerAuthenticatorInput, 
 
 		attType, trustPath, err := pubKeyAtt.VerifyAttestationStatement()
 		if err != nil {
-			return errlog.Handle(ctx, err)
+			return nil, errlog.Handle(ctx, err)
 		} else {
 			fmt.Printf("attType: %s\n", attType.String())
 			fmt.Printf("trustPath: %+v\n", trustPath)
 		}
 	}
-	return nil
+	return &auth, nil
 }

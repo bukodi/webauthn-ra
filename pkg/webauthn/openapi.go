@@ -1,7 +1,6 @@
 package webauthn
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -65,7 +64,7 @@ func AuthenticatorRegisterREST() usecase.IOInteractor {
 
 	type AuthenticatorRegisterRequest struct {
 		Response      map[string]any `json:"response"`
-		FullChallenge string         `json:"fullChallenge"`
+		FullChallenge []byte         `json:"fullChallenge"`
 	}
 
 	type AuthenticatorRegisterResponse struct {
@@ -86,22 +85,21 @@ func AuthenticatorRegisterREST() usecase.IOInteractor {
 			out = output.(*AuthenticatorRegisterResponse)
 		)
 
-		var buf bytes.Buffer
-		err := json.NewEncoder(&buf).Encode(in)
+		respBytes, err := json.MarshalIndent(in.Response, "", "  ")
 		if err != nil {
 			out.ErrorMessage = err.Error()
 			errlog.LogError(ctx, err)
 			return nil
 		} else {
-			inputStr := buf.String()
-			fmt.Printf("Input: %s\n\n", inputStr)
+			fmt.Printf("Response: %s\n\n", string(respBytes))
 		}
 
-		/*err := RegisterAuthenticator(ctx, in, out)
+		authObj, err := RegisterAuthenticator(ctx, respBytes, in.FullChallenge)
 		if err != nil {
 			out.ErrorMessage = err.Error()
 			errlog.LogError(ctx, err)
-		}*/
+		}
+		out.AuthenticatorGUID = authObj.AAGUID
 		return nil
 	})
 	return u

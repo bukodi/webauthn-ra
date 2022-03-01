@@ -63,8 +63,8 @@ func AuthenticatorOptionsREST() usecase.IOInteractor {
 func AuthenticatorRegisterREST() usecase.IOInteractor {
 
 	type AuthenticatorRegisterRequest struct {
-		Response      map[string]any `json:"response"`
-		FullChallenge []byte         `json:"fullChallenge"`
+		Response      any    `json:"response"`
+		FullChallenge []byte `json:"fullChallenge"`
 	}
 
 	type AuthenticatorRegisterResponse struct {
@@ -98,6 +98,7 @@ func AuthenticatorRegisterREST() usecase.IOInteractor {
 		if err != nil {
 			out.ErrorMessage = err.Error()
 			errlog.LogError(ctx, err)
+			return nil
 		}
 		out.AuthenticatorGUID = authObj.AAGUID
 		return nil

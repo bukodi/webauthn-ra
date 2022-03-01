@@ -28,20 +28,28 @@ class WebauthnService {
       });
   }
 
-  attestationResult (cred: Credential): Promise<ParsedAttestation> {
+  authenticatorRegister (cred: Credential): Promise<ParsedAttestation> {
     const pubKeyCred = cred as PublicKeyCredential;
     const attestResp = pubKeyCred.response as AuthenticatorAttestationResponse;
 
-    console.log('rawId : ', pubKeyCred.rawId);
+    console.log('pubKeyCred : ', pubKeyCred);
+    const aCred: any = cred;
+    Object.setPrototypeOf(aCred, PublicKeyCredential);
+    console.log('aCred : ', aCred);
+    console.log('typeof aCred : ', typeof aCred);
+    console.log('pubKeyCred as any : ', JSON.stringify(aCred));
 
     const bodyStr = JSON.stringify({
-      id: pubKeyCred.id,
-      rawId: arrayBufferToBase64(pubKeyCred.rawId),
       response: {
-        attestationObject: arrayBufferToBase64(attestResp.attestationObject),
-        clientDataJSON: arrayBufferToBase64(attestResp.clientDataJSON)
+        id: pubKeyCred.id,
+        rawId: pubKeyCred.rawId,
+        response: {
+          attestationObject: arrayBufferToBase64(attestResp.attestationObject),
+          clientDataJSON: arrayBufferToBase64(attestResp.clientDataJSON)
+        },
+        type: pubKeyCred.type
       },
-      type: pubKeyCred.type
+      fullChallenge: 'cicamica-haj'
     });
     console.log('Request body: ' + bodyStr);
 

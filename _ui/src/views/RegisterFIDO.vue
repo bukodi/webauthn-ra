@@ -112,7 +112,7 @@ export default class RegisterFIDO extends Vue {
     console.log('assertResp.signature=', assertResp.signature);
     console.log('assertResp.userHandle=', assertResp.userHandle);
 
-    webauthnService.attestationResult(pubKeyCred).then(value => {
+    webauthnService.authenticatorRegister(pubKeyCred).then(value => {
       console.log('registerAuthenticator returned=', value);
     }).catch(reason => {
       console.log('registerAuthenticator error=', reason);

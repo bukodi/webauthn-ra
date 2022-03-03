@@ -63,8 +63,8 @@ func AuthenticatorOptionsREST() usecase.IOInteractor {
 func AuthenticatorRegisterREST() usecase.IOInteractor {
 
 	type AuthenticatorRegisterRequest struct {
-		Response      any    `json:"response"`
-		FullChallenge []byte `json:"fullChallenge"`
+		Credential    any    `json:"credential"`
+		FullChallenge []byte `json:"fullChallenge,omitempty"`
 	}
 
 	type AuthenticatorRegisterResponse struct {
@@ -85,7 +85,7 @@ func AuthenticatorRegisterREST() usecase.IOInteractor {
 			out = output.(*AuthenticatorRegisterResponse)
 		)
 
-		respBytes, err := json.MarshalIndent(in.Response, "", "  ")
+		respBytes, err := json.MarshalIndent(in.Credential, "", "  ")
 		if err != nil {
 			out.ErrorMessage = err.Error()
 			errlog.LogError(ctx, err)

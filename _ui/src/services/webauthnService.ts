@@ -28,29 +28,22 @@ class WebauthnService {
       });
   }
 
-  authenticatorRegister (cred: Credential): Promise<ParsedAttestation> {
-    const pubKeyCred = cred as PublicKeyCredential;
+  authenticatorRegister (pubKeyCred: PublicKeyCredential): Promise<ParsedAttestation> {
     const attestResp = pubKeyCred.response as AuthenticatorAttestationResponse;
 
     console.log('pubKeyCred : ', pubKeyCred);
-    const aCred: any = cred;
-    Object.setPrototypeOf(aCred, PublicKeyCredential);
-    console.log('aCred : ', aCred);
-    console.log('typeof aCred : ', typeof aCred);
-    console.log('pubKeyCred as any : ', JSON.stringify(aCred));
 
     const bodyStr = JSON.stringify({
-      response: {
+      credential: {
         id: pubKeyCred.id,
-        rawId: pubKeyCred.rawId,
+        rawId: arrayBufferToBase64(pubKeyCred.rawId),
         response: {
           attestationObject: arrayBufferToBase64(attestResp.attestationObject),
           clientDataJSON: arrayBufferToBase64(attestResp.clientDataJSON)
         },
         type: pubKeyCred.type
-      },
-      fullChallenge: 'cicamica-haj'
-    });
+      }
+    }, null, 2);
     console.log('Request body: ' + bodyStr);
 
     return fetch(process.env.VUE_APP_SERVER_API_URL + '/webauthn/authenticator/register', {

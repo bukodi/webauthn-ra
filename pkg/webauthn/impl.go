@@ -11,6 +11,8 @@ import (
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/bukodi/webauthn-ra/pkg/openapi"
 	"github.com/fxamacker/webauthn"
+	_ "github.com/fxamacker/webauthn/fidou2f"
+	_ "github.com/fxamacker/webauthn/packed"
 )
 
 // Declare input port type.

@@ -119,7 +119,16 @@ func RegisterAuthenticator(ctx context.Context, attestationBytes []byte, fullCha
 		return nil, fmt.Errorf("Can't YoubikeyRootCert")
 	}
 
+	fullChallenge = []byte("123456")
+	challengeHash := sha256.Sum256(fullChallenge)
+	challengeStr := base64.RawURLEncoding.EncodeToString(challengeHash[:])
+
 	var attExpectedData webauthn.AttestationExpectedData
+	attExpectedData.Challenge = challengeStr
+	attExpectedData.Origin = "http://localhost:8080"
+	attExpectedData.RPID = config.RpId
+	attExpectedData.CredentialAlgs = []int{-7, -257}
+
 	attType, trustPath, err := webauthn.VerifyAttestation(pubKeyAtt, &attExpectedData)
 	if err != nil {
 		return nil, errlog.Handle(ctx, err)

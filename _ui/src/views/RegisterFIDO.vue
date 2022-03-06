@@ -28,7 +28,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import TopToolbar from '../components/TopToolbar.vue';
 import webauthnService, { AuthenticatorOptionsRequest } from '@/services/webauthnService';
-import { base64ToArrayBuffer } from '@/services/servicesBase';
+import { base64urlToArrayBuffer } from '@/services/servicesBase';
 
 @Component({
   components: {
@@ -59,10 +59,10 @@ export default class RegisterFIDO extends Vue {
         const opts = resp.credentialCreationOptions;
 
         const pkcco: PublicKeyCredentialCreationOptions = {
-          challenge: base64ToArrayBuffer(opts.challenge),
+          challenge: base64urlToArrayBuffer(opts.challenge),
           rp: opts.rp as PublicKeyCredentialRpEntity,
           user: {
-            id: base64ToArrayBuffer(opts.user.id),
+            id: base64urlToArrayBuffer(opts.user.id),
             name: opts.user.name,
             displayName: opts.user.displayName
           } as PublicKeyCredentialUserEntity,

@@ -7,7 +7,21 @@ export function arrayBufferToBase64 (buffer: ArrayBuffer): string {
   return window.btoa(binary);
 }
 
-export function base64ToArrayBuffer (b64: string): Uint8Array {
+export function arrayBufferToBase64Url (buffer: ArrayBuffer): string {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  let urlString = window.btoa(binary);
+  // Replace non-url compatible chars with base64 standard chars
+  urlString = urlString.replace(/\+/g, '-').replace(/\//g, '_');
+  // Remove padding
+  urlString = urlString.replace(/=/g, '');
+  return urlString;
+}
+
+export function base64urlToArrayBuffer (b64: string): Uint8Array {
   // Replace non-url compatible chars with base64 standard chars
   let input = b64.replace(/-/g, '+').replace(/_/g, '/');
 

@@ -28,7 +28,7 @@ class WebauthnService {
       });
   }
 
-  authenticatorRegister (pubKeyCred: PublicKeyCredential): Promise<ParsedAttestation> {
+  authenticatorRegister (pubKeyCred: PublicKeyCredential, fullChallenge: string): Promise<ParsedAttestation> {
     const attestResp = pubKeyCred.response as AuthenticatorAttestationResponse;
 
     console.log('pubKeyCred : ', pubKeyCred);
@@ -42,7 +42,8 @@ class WebauthnService {
           clientDataJSON: arrayBufferToBase64(attestResp.clientDataJSON)
         },
         type: pubKeyCred.type
-      }
+      },
+      fullChallenge: fullChallenge
     }, null, 2);
     console.log('Request body: ' + bodyStr);
 

@@ -5,7 +5,6 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
-	"crypto/x509"
 	"encoding/base64"
 	"fmt"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
@@ -45,7 +44,7 @@ func GetAttestationOptions(ctx context.Context, authenticatorType webauthn.Authe
 	if _, err := rand.Read(userId); err != nil {
 		return nil, nil, errlog.Handle(ctx, err)
 	}
-	fullChallenge = []byte("123456")
+	fullChallenge = []byte("123456") // TODO
 	challengeHash := sha256.Sum256(fullChallenge)
 
 	pkcco := webauthn.PublicKeyCredentialCreationOptions{
@@ -90,42 +89,13 @@ func RegisterAuthenticator(ctx context.Context, attestationBytes []byte, fullCha
 
 	auth := Authenticator{}
 	_ = auth
-	/*out.AuthenticatorGUID = hex.EncodeToString(pubKeyAtt.AuthnData.AAGUID)
-	out.AuthenticatorType = "Unknown type"
-	if pubKeyAtt.AuthnData != nil {
-		out.UserPresent = pubKeyAtt.AuthnData.UserPresent
-		out.UserVerified = pubKeyAtt.AuthnData.UserVerified
-		if pubKeyAtt.AuthnData.Credential != nil {
-			pubKey := pubKeyAtt.AuthnData.Credential.PublicKey
-			pubKeyBytes, err := x509.MarshalPKIXPublicKey(pubKey)
-			if err != nil {
-				return errlog.Handle(ctx, err)
-			} else {
-				pemBytes := pem.EncodeToMemory(&pem.Block{
-					Type:  "PUBLIC KEY",
-					Bytes: pubKeyBytes,
-				})
-				out.PublicKeyPEM = string(pemBytes)
-			}
-		}
 
-	}*/
-
-	sysPool, err := x509.SystemCertPool()
-	if err != nil {
-		return nil, errlog.Handle(ctx, err)
-	}
-	if !sysPool.AppendCertsFromPEM([]byte(pem_Yubico_U2F_Root_CA_Serial_457200631)) {
-		return nil, fmt.Errorf("Can't YoubikeyRootCert")
-	}
-
-	fullChallenge = []byte("123456")
 	challengeHash := sha256.Sum256(fullChallenge)
 	challengeStr := base64.RawURLEncoding.EncodeToString(challengeHash[:])
 
 	var attExpectedData webauthn.AttestationExpectedData
 	attExpectedData.Challenge = challengeStr
-	attExpectedData.Origin = "http://localhost:8080"
+	attExpectedData.Origin = "http://localhost:8081"
 	attExpectedData.RPID = config.RpId
 	attExpectedData.CredentialAlgs = []int{-7, -257}
 
@@ -150,5 +120,6 @@ func RegisterAuthenticator(ctx context.Context, attestationBytes []byte, fullCha
 			fmt.Printf("trustPath: %+v\n", trustPath)
 		}
 	}
+	//auth.AAGUID =
 	return &auth, nil
 }

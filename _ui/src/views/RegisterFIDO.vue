@@ -48,7 +48,7 @@ export default class RegisterFIDO extends Vue {
     this.startRegister('cross-platform');
   }
 
-  webauthnAttestationOptions (type: AuthenticatorAttachment): Promise<{ opts: PublicKeyCredentialCreationOptions; fc: string }> {
+  webauthnAttestationOptions (type: AuthenticatorAttachment): Promise<{ opts: PublicKeyCredentialCreationOptions; fullChallenge: string }> {
     const req = {
       authenticatorAttachment: type
     } as AuthenticatorOptionsRequest;
@@ -74,7 +74,7 @@ export default class RegisterFIDO extends Vue {
         console.log('After conversion: ', pkcco);
         return {
           opts: pkcco,
-          fc: resp.fullChallenge
+          fullChallenge: resp.fullChallenge
         };
       });
   }
@@ -92,7 +92,7 @@ export default class RegisterFIDO extends Vue {
           console.log('null returned.');
           return;
         }
-        this.dumpCread(value);
+        this.dumpCread(value, ret.fullChallenge);
       });
     }
     ).catch(err => {
@@ -100,7 +100,7 @@ export default class RegisterFIDO extends Vue {
     });
   }
 
-  dumpCread (cred: Credential) {
+  dumpCread (cred: Credential, fullChallenge: string) {
     const pubKeyCred = cred as PublicKeyCredential;
     console.log('pubKeyCred.id=', pubKeyCred.id);
     console.log('pubKeyCred.type=', pubKeyCred.type);
@@ -112,7 +112,7 @@ export default class RegisterFIDO extends Vue {
     console.log('assertResp.signature=', assertResp.signature);
     console.log('assertResp.userHandle=', assertResp.userHandle);
 
-    webauthnService.authenticatorRegister(pubKeyCred).then(value => {
+    webauthnService.authenticatorRegister(pubKeyCred, fullChallenge).then(value => {
       console.log('registerAuthenticator returned=', value);
     }).catch(reason => {
       console.log('registerAuthenticator error=', reason);

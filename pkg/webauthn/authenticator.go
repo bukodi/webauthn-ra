@@ -6,7 +6,8 @@ var _ model.Record = &Authenticator{}
 
 type Authenticator struct {
 	RegistrationId string `gorm:"primary_key"`
-	AAGUID         string
+	AAGUID         []byte `gorm:"aaguid"`
+	//ClientDataJSON
 }
 
 func (r *Authenticator) Id() string {

@@ -2,6 +2,7 @@ package webauthn
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
@@ -25,7 +26,7 @@ func AuthenticatorOptionsREST() usecase.IOInteractor {
 
 	type AuthenticatorOptionsResponse struct {
 		openapi.ServerResponse
-		FullChallenge             []byte                                       `json:"fullChallenge"`
+		FullChallenge             string                                       `json:"fullChallenge"`
 		CredentialCreationOptions *webauthn.PublicKeyCredentialCreationOptions `json:"credentialCreationOptions"`
 	}
 
@@ -53,7 +54,7 @@ func AuthenticatorOptionsREST() usecase.IOInteractor {
 			errlog.LogError(ctx, err)
 		} else {
 			out.CredentialCreationOptions = ccOptions
-			out.FullChallenge = fullChallenge
+			out.FullChallenge = base64.RawURLEncoding.EncodeToString(fullChallenge)
 		}
 		return nil
 	})
@@ -64,7 +65,7 @@ func AuthenticatorRegisterREST() usecase.IOInteractor {
 
 	type AuthenticatorRegisterRequest struct {
 		Credential    any    `json:"credential"`
-		FullChallenge []byte `json:"fullChallenge,omitempty"`
+		FullChallenge string `json:"fullChallenge,omitempty"`
 	}
 
 	type AuthenticatorRegisterResponse struct {
@@ -94,13 +95,20 @@ func AuthenticatorRegisterREST() usecase.IOInteractor {
 			fmt.Printf("Response: %s\n\n", string(respBytes))
 		}
 
-		authObj, err := RegisterAuthenticator(ctx, respBytes, in.FullChallenge)
+		fullChallenge, err := base64.RawURLEncoding.DecodeString(in.FullChallenge)
 		if err != nil {
 			out.ErrorMessage = err.Error()
 			errlog.LogError(ctx, err)
 			return nil
 		}
-		out.AuthenticatorGUID = authObj.AAGUID
+
+		authObj, err := RegisterAuthenticator(ctx, respBytes, fullChallenge)
+		if err != nil {
+			out.ErrorMessage = err.Error()
+			errlog.LogError(ctx, err)
+			return nil
+		}
+		out.AuthenticatorGUID = base64.RawURLEncoding.EncodeToString(authObj.AAGUID)
 		return nil
 	})
 	return u

@@ -5,13 +5,17 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/x509"
 	"encoding/base64"
 	"fmt"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/bukodi/webauthn-ra/pkg/openapi"
+	"github.com/bukodi/webauthn-ra/pkg/repo"
+	"github.com/bukodi/webauthn-ra/pkg/util"
 	"github.com/fxamacker/webauthn"
 	_ "github.com/fxamacker/webauthn/fidou2f"
 	_ "github.com/fxamacker/webauthn/packed"
+	"time"
 )
 
 // Declare input port type.
@@ -87,19 +91,23 @@ func RegisterAuthenticator(ctx context.Context, attestationBytes []byte, fullCha
 		return nil, errlog.Handle(ctx, err)
 	}
 
-	auth := Authenticator{}
-	_ = auth
-
 	challengeHash := sha256.Sum256(fullChallenge)
-	challengeStr := base64.RawURLEncoding.EncodeToString(challengeHash[:])
 
-	var attExpectedData webauthn.AttestationExpectedData
-	attExpectedData.Challenge = challengeStr
-	attExpectedData.Origin = "http://localhost:8081"
-	attExpectedData.RPID = config.RpId
-	attExpectedData.CredentialAlgs = []int{-7, -257}
+	auth := Authenticator{
+		RegistrationID:   pubKeyAtt.ID,
+		ChallengeHash:    base64.RawURLEncoding.EncodeToString(challengeHash[:]),
+		Attestation:      attestationBytes,
+		VerifiedRPID:     config.RpId,
+		VerifiedOrigin:   "http://localhost:8080",
+		VerificationTime: time.Now(),
+	}
 
-	attType, trustPath, err := webauthn.VerifyAttestation(pubKeyAtt, &attExpectedData)
+	attType, trustPath, err := webauthn.VerifyAttestation(pubKeyAtt, &webauthn.AttestationExpectedData{
+		Challenge:      auth.ChallengeHash,
+		Origin:         auth.VerifiedOrigin,
+		RPID:           auth.VerifiedRPID,
+		CredentialAlgs: []int{-7, -257},
+	})
 	if err != nil {
 		return nil, errlog.Handle(ctx, err)
 	} else {
@@ -107,19 +115,22 @@ func RegisterAuthenticator(ctx context.Context, attestationBytes []byte, fullCha
 		fmt.Printf("trustPath: %+v\n", trustPath)
 	}
 
-	if pubKeyAtt.AttStmt != nil {
-		test := []uint8{0, 1}
-		fmt.Printf("test dump: %s\n\n", base64.StdEncoding.EncodeToString(test))
-		fmt.Printf("pubKeyAtt.AttStmt: %#v\n\n", pubKeyAtt.AttStmt)
-
-		attType, trustPath, err := pubKeyAtt.VerifyAttestationStatement()
-		if err != nil {
-			return nil, errlog.Handle(ctx, err)
-		} else {
-			fmt.Printf("attType: %s\n", attType.String())
-			fmt.Printf("trustPath: %+v\n", trustPath)
+	if trustPath != nil {
+		if certs, ok := trustPath.([]*x509.Certificate); ok {
+			if len(certs) > 0 {
+				auth.TrustCertThumbprint = util.CertThumbprint(certs[0])
+			}
 		}
 	}
+
+	if pubKeyAtt.AttStmt != nil {
+		auth.AuthenticatorGUID = pubKeyAtt.AuthnData.AAGUID
+		// TODO: verify Authenticator type exists with this AAGUID
+	}
 	//auth.AAGUID =
+	if err = repo.Create(ctx, &auth); err != nil {
+		return nil, errlog.Handle(ctx, err)
+	}
+
 	return &auth, nil
 }

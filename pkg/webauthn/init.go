@@ -21,5 +21,8 @@ func Init(ctx context.Context, cfg *Config) error {
 	if err := repo.RegisterType[*model.AuthenticatorModel](); err != nil {
 		return errlog.Handle(nil, err)
 	}
+	if err := repo.RegisterType[*Authenticator](); err != nil {
+		return errlog.Handle(nil, err)
+	}
 	return nil
 }

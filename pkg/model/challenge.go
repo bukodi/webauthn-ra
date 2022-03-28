@@ -7,8 +7,8 @@ import (
 var _ Record = &Challenge{}
 
 type Challenge struct {
-	Hash   string `gorm:"primary_key;column:id"`
-	AAGUID string
+	Hash    string `gorm:"primary_key;column:id"` // base64url encoded SHA256 hash of the RawData
+	RawData []byte
 }
 
 func (r *Challenge) SetId(id string) {

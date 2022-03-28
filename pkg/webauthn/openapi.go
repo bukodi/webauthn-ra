@@ -108,7 +108,7 @@ func AuthenticatorRegisterREST() usecase.IOInteractor {
 			errlog.LogError(ctx, err)
 			return nil
 		}
-		out.AuthenticatorGUID = base64.RawURLEncoding.EncodeToString(authObj.AAGUID)
+		out.AuthenticatorGUID = base64.RawURLEncoding.EncodeToString(authObj.AuthenticatorGUID)
 		return nil
 	})
 	return u

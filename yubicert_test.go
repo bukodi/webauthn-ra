@@ -48,8 +48,8 @@ func TestYubiCert(t *testing.T) {
 	sysPool.AddCert(yubiRoot)
 
 	var opts x509.VerifyOptions
-	//opts.Roots = x509.NewCertPool()
-	//opts.Roots.AddCert(yubiRoot)
+	opts.Roots = x509.NewCertPool()
+	opts.Roots.AddCert(yubiRoot)
 	chain, err := devCert.Verify(opts)
 	if err != nil {
 		t.Fatal(err)

@@ -68,7 +68,7 @@ func GetAttestationOptions(ctx context.Context, authenticatorType webauthn.Authe
 			//ResidentKey:             webauthn.ResidentKeyRequired,
 			//UserVerification:        webauthn.UserVerificationRequired,
 		},
-		Attestation: webauthn.AttestationDirect,
+		Attestation: webauthn.AttestationIndirect,
 		// See: https://www.w3.org/TR/webauthn-3/#typedefdef-cosealgorithmidentifier
 		PubKeyCredParams: []webauthn.PublicKeyCredentialParameters{
 			{

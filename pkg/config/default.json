@@ -13,8 +13,11 @@
   "listeners": [
     {
       "name": "frontend",
-      "protocol": "https",
       "address": ":3000",
+      "tls": {
+          "privateKey": "",
+          "certificate": ""
+      },
       "handlers": ["ui","api"]
     },
     {

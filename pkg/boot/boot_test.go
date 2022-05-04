@@ -13,7 +13,7 @@ func TestBoot(t *testing.T) {
 	}
 
 	c := model.Challenge{
-		AAGUID: "cica",
+		Hash: "",
 	}
 	if err := repo.Create(context.TODO(), &c); err != nil {
 		t.Fatal(err)

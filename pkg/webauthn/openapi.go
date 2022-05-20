@@ -1,6 +1,7 @@
 package webauthn
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -109,6 +110,32 @@ func AuthenticatorRegisterREST() usecase.IOInteractor {
 			return nil
 		}
 		out.AuthenticatorGUID = base64.RawURLEncoding.EncodeToString(authObj.AuthenticatorGUID)
+
+		{
+			parsedAuthObj, err := webauthn.ParseAttestation(bytes.NewReader(authObj.Attestation))
+			if err != nil {
+				out.ErrorMessage = err.Error()
+				errlog.LogError(ctx, err)
+				return nil
+			}
+			b, err := json.MarshalIndent(parsedAuthObj, "", "  ")
+			if err != nil {
+				out.ErrorMessage = err.Error()
+				errlog.LogError(ctx, err)
+				return nil
+			}
+			fmt.Printf("---- parsedAuthObj ------: \n%s\n--------\n", string(b))
+		}
+		{
+			b, err := json.MarshalIndent(authObj, "", "  ")
+			if err != nil {
+				out.ErrorMessage = err.Error()
+				errlog.LogError(ctx, err)
+				return nil
+			}
+			fmt.Printf("---- authObj ------: \n%s\n--------\n", string(b))
+		}
+
 		return nil
 	})
 	return u

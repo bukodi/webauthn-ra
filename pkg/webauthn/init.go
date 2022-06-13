@@ -19,10 +19,10 @@ var config *Config
 func Init(ctx context.Context, cfg *Config) error {
 	config = cfg
 	if err := repo.RegisterType[*model.AuthenticatorModel](); err != nil {
-		return errlog.Handle(nil, err)
+		return errlog.Handle(ctx, err)
 	}
 	if err := repo.RegisterType[*Authenticator](); err != nil {
-		return errlog.Handle(nil, err)
+		return errlog.Handle(ctx, err)
 	}
 	return nil
 }

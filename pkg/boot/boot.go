@@ -2,6 +2,7 @@ package boot
 
 import (
 	"context"
+	"github.com/bukodi/webauthn-ra/pkg/certs"
 	"github.com/bukodi/webauthn-ra/pkg/config"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/bukodi/webauthn-ra/pkg/listeners"
@@ -28,6 +29,14 @@ func Boot(ctx context.Context) error {
 		return errlog.Handle(ctx, err)
 	}
 	if err = repo.Init(ctx, &dbOpts); err != nil {
+		return errlog.Handle(ctx, err)
+	}
+
+	var certsOpts certs.Config
+	if err := config.InitStruct("certs", &certsOpts); err != nil {
+		return errlog.Handle(ctx, err)
+	}
+	if err = certs.Init(ctx, &certsOpts); err != nil {
 		return errlog.Handle(ctx, err)
 	}
 

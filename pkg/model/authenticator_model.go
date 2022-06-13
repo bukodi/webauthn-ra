@@ -12,6 +12,10 @@ func (r *AuthenticatorModel) Id() string {
 	return r.AAGUID
 }
 
+func (r *AuthenticatorModel) IdFieldName() string {
+	return "AAGUID"
+}
+
 func (r *AuthenticatorModel) SetId(id string) {
 	r.AAGUID = id
 }

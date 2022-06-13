@@ -22,6 +22,10 @@ type FooDTO struct {
 	HiddenField3 string
 }
 
+func TestCica(t *testing.T) {
+
+}
+
 func TestMarshall(t *testing.T) {
 
 	rec := &FooRecord{

@@ -5,6 +5,7 @@ import (
 	"crypto"
 	"crypto/rand"
 	"encoding/json"
+	"fmt"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/bukodi/webauthn-ra/pkg/model"
 	"github.com/oklog/ulid/v2"
@@ -19,11 +20,15 @@ func Create[R model.Record](ctx context.Context, r R) error {
 	var signer crypto.Signer
 	err := ExecuteInWriteTx(ctx, signer, func(ctx context.Context) error {
 		if r.Id() == "" {
-			id, err := ulid.New(uint64(time.Now().UnixMilli()), rand.Reader)
-			if err != nil {
-				return errlog.Handle(ctx, err)
+			if iag, ok := any(r).(model.IdAutoGenerator); ok {
+				id, err := ulid.New(uint64(time.Now().UnixMilli()), rand.Reader)
+				if err != nil {
+					return errlog.Handle(ctx, err)
+				}
+				iag.SetId(id.String())
+			} else {
+				return errlog.Handle(ctx, fmt.Errorf("id isn't set")) // TODO replace with Err constant
 			}
-			r.SetId(id.String())
 		}
 
 		jsonBytes, err := json.Marshal(r)

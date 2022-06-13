@@ -11,6 +11,10 @@ type Challenge struct {
 	RawData []byte
 }
 
+func (r *Challenge) IdFieldName() string {
+	return "Hash"
+}
+
 func (r *Challenge) SetId(id string) {
 	r.Hash = id
 }

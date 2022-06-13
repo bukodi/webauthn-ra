@@ -118,7 +118,7 @@ func RegisterAuthenticator(ctx context.Context, attestationBytes []byte, fullCha
 	if trustPath != nil {
 		if certs, ok := trustPath.([]*x509.Certificate); ok {
 			if len(certs) > 0 {
-				auth.TrustCertThumbprint = util.CertThumbprint(certs[0])
+				auth.TrustCertThumbprintSHA256 = util.CertThumbprintSHA256(certs[0])
 			}
 		}
 	}

@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-var _ model.Record = &Certificate{}
+var _ model.Record = &StoredCert{}
 
-type Certificate struct {
+type StoredCert struct {
 	ThumbprintSHA256 string `gorm:"primary_key"` // SHA256 hash of the DER encoded certificate
 	Raw              []byte // DER encoded certificate
 
@@ -23,25 +23,17 @@ type Certificate struct {
 	NotAfter  time.Time // Cached X.509 field
 }
 
-func (r *Certificate) IdFieldName() string {
+func (r *StoredCert) IdFieldName() string {
 	return "ThumbprintSHA256"
 }
 
-func (r *Certificate) Id() string {
+func (r *StoredCert) Id() string {
 	return r.ThumbprintSHA256
 }
 
-func AddCertificateDER(ctx context.Context, derBytes []byte) (*Certificate, error) {
-	if x509Cer, err := x509.ParseCertificate(derBytes); err != nil {
-		return nil, errlog.Handle(ctx, err)
-	} else {
-		return AddCertificate(ctx, x509Cer)
-	}
-}
+func AddCertificate(ctx context.Context, x509Cer *x509.Certificate) (*StoredCert, error) {
 
-func AddCertificate(ctx context.Context, x509Cer *x509.Certificate) (*Certificate, error) {
-
-	var cer = &Certificate{
+	var cer = &StoredCert{
 		ThumbprintSHA256: util.CertThumbprintSHA256(x509Cer),
 		Raw:              x509Cer.Raw,
 		IssuerDN:         x509Cer.Issuer.String(),
@@ -54,4 +46,10 @@ func AddCertificate(ctx context.Context, x509Cer *x509.Certificate) (*Certificat
 	}
 
 	return cer, nil
+}
+
+func FindByThumbprint(ctx context.Context, thumbprint string) (*StoredCert, error) {
+	var scert StoredCert
+	err := repo.FindById(ctx, &scert, thumbprint)
+	return &scert, err
 }

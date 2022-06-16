@@ -9,11 +9,11 @@ import (
 type Config struct {
 }
 
-var config *Config
+var moduleCfg *Config
 
 func Init(ctx context.Context, cfg *Config) error {
-	config = cfg
-	if err := repo.RegisterType[*Certificate](); err != nil {
+	moduleCfg = cfg
+	if err := repo.RegisterType[*StoredCert](); err != nil {
 		return errlog.Handle(ctx, err)
 	}
 	return nil

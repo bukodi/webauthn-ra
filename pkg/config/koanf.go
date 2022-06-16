@@ -3,6 +3,7 @@ package config
 import (
 	_ "embed"
 	"fmt"
+	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/json"
 	"github.com/knadh/koanf/providers/file"
@@ -14,20 +15,32 @@ var (
 	parser = json.Parser()
 )
 
-var FilePath string
-
 //go:embed default.json
 var DefaultJSON string
 
-func Load() error {
-
-	if FilePath != "" {
-		if err := k.Load(file.Provider(FilePath), json.Parser()); err != nil {
-			return fmt.Errorf("error loading %s config file: %v", FilePath, err)
+func LoadFromFile(filePath string) error {
+	if filePath != "" {
+		if err := k.Load(file.Provider(filePath), json.Parser()); err != nil {
+			return fmt.Errorf("error loading %s config file: %v", filePath, err)
 		}
 	} else if DefaultJSON != "" {
 		if err := k.Load(rawbytes.Provider([]byte(DefaultJSON)), json.Parser()); err != nil {
 			return err
+		}
+	}
+
+	return nil
+}
+
+func LoadFromJson(jsonConfig string) error {
+
+	if jsonConfig != "" {
+		if err := k.Load(rawbytes.Provider([]byte(jsonConfig)), json.Parser()); err != nil {
+			return errlog.Handle(nil, err)
+		}
+	} else if DefaultJSON != "" {
+		if err := k.Load(rawbytes.Provider([]byte(DefaultJSON)), json.Parser()); err != nil {
+			return errlog.Handle(nil, err)
 		}
 	}
 
@@ -39,9 +52,13 @@ func InitStruct(path string, cfg interface{}) error {
 		DecoderConfig: nil,
 	}
 	err := k.UnmarshalWithConf(path, cfg, opts)
-	return err
+	return errlog.Handle(nil, err)
 }
 
 func ExportJSON() ([]byte, error) {
-	return k.Marshal(json.Parser())
+	if bytes, err := k.Marshal(json.Parser()); err != nil {
+		return nil, errlog.Handle(nil, err)
+	} else {
+		return bytes, nil
+	}
 }

@@ -21,7 +21,7 @@ func Boot(ctx context.Context) error {
 		ctx = context.Background()
 	}
 
-	if err := config.Load(); err != nil {
+	if err := config.LoadFromFile(""); err != nil {
 		return errlog.Handle(ctx, err)
 	}
 	var dbOpts repo.Config

@@ -15,7 +15,7 @@ func TestDefault(t *testing.T) {
 		"key4": "Value 4" 
 	}`
 
-	if err := Load(); err != nil {
+	if err := LoadFromFile(""); err != nil {
 		t.Fatal(err)
 	}
 

@@ -12,21 +12,18 @@ func ToError(recovered interface{}) error {
 	if isErr {
 		return err
 	} else {
-		return fmt.Errorf("%v", recovered)
-	}
-}
-
-func CatchPanicToHandler(fn func(err error)) {
-	recoveredErr := ToError(recover())
-	if recoveredErr != nil {
-		fn(recoveredErr)
+		return fmt.Errorf("recovered panic: %+v", recovered)
 	}
 }
 
 func CatchPanicToVar(destErr *error) {
 	recoveredErr := ToError(recover())
 	if recoveredErr != nil {
-		*destErr = recoveredErr
+		if *destErr == nil {
+			*destErr = recoveredErr
+		} else {
+			*destErr = fmt.Errorf("recovered: %w, supressed:%v", recoveredErr, *destErr)
+		}
 	}
 }
 

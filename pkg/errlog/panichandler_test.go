@@ -2,6 +2,7 @@ package errlog
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -37,4 +38,42 @@ func fnUnsafeDiv(x, y int) (int, error) {
 	}
 	z := x / y
 	return z, nil
+}
+
+func TestCatchPanicToVar(t *testing.T) {
+	var err error
+	if err = fnResourceWrite("f"); err != nil {
+		t.Log(err)
+	}
+	if err = fnResourceWrite("cant_open"); err != nil {
+		t.Log(err)
+	}
+	if err = fnResourceWrite("cant_close"); err != nil {
+		t.Log(err)
+	}
+	if err = fnResourceWrite("cant_close, cant_write"); err != nil {
+		t.Log(err)
+	}
+	if err = fnResourceWrite("cant_write"); err != nil {
+		t.Log(err)
+	}
+}
+
+func fnResourceWrite(resourceName string) (err error) {
+	defer CatchPanicToVar(&err)
+
+	if strings.Contains(resourceName, "cant_open") {
+		return fmt.Errorf("can't open: %s", resourceName)
+	}
+	defer func() {
+		if strings.Contains(resourceName, "cant_close") {
+			panic(fmt.Errorf("can't close: %s", resourceName))
+		}
+	}()
+
+	if strings.Contains(resourceName, "cant_write") {
+		return fmt.Errorf("can't write: %s", resourceName)
+	}
+
+	return nil
 }

@@ -34,19 +34,18 @@ func NewValidatedSet[E Entry]() *ValidatedSet[E] {
 func (vs *ValidatedSet[E]) MasterHash() [32]byte {
 	return vs.masterHash
 }
-func (vs *ValidatedSet[E]) Get(id [32]byte) (*E, error) {
+func (vs *ValidatedSet[E]) Get(id [32]byte, entry E) error {
 	valueBytes, ok := vs.valuesById[id]
 	if !ok {
-		return nil, nil
+		return fmt.Errorf("not found")
 	} else if valueBytes == nil {
 		valueBytes = make([]byte, 0)
 	}
-	var e E
-	err := e.Unmarshall(valueBytes)
+	err := entry.Unmarshall(valueBytes)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return &e, nil
+	return nil
 }
 
 func (vs *ValidatedSet[E]) Delete(id [32]byte) error {
@@ -59,8 +58,8 @@ func (vs *ValidatedSet[E]) Delete(id [32]byte) error {
 	return nil
 }
 
-func (vs *ValidatedSet[E]) Add(entry *E) ([32]byte, error) {
-	valueBytes, err := (*entry).Marshall()
+func (vs *ValidatedSet[E]) Add(entry E) ([32]byte, error) {
+	valueBytes, err := entry.Marshall()
 	if err != nil {
 		return [32]byte{}, err
 	}
@@ -73,17 +72,18 @@ func (vs *ValidatedSet[E]) Add(entry *E) ([32]byte, error) {
 	return id, nil
 }
 
-func (vs *ValidatedSet[E]) Update(prevId [32]byte, entry *E) ([32]byte, error) {
+func (vs *ValidatedSet[E]) Update(prevId [32]byte, entry E) ([32]byte, error) {
 	_, ok := vs.valuesById[prevId]
 	if !ok {
 		return [32]byte{}, fmt.Errorf("not found")
 	}
 
-	valueBytes, err := (*entry).Marshall()
+	valueBytes, err := entry.Marshall()
 	if err != nil {
 		return [32]byte{}, err
 	}
 	id := sha256.Sum256(valueBytes)
+	delete(vs.valuesById, prevId)
 	vs.valuesById[id] = valueBytes
 	vs.masterHash = Xor(vs.masterHash, prevId, id)
 	return id, nil

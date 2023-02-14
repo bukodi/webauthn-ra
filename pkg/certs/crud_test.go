@@ -37,7 +37,7 @@ func pemToCer(cerPem string) *x509.Certificate {
 
 func TestCRUD(t *testing.T) {
 	ctx := context.TODO()
-	repo.Init(ctx, &repo.Config{Driver: "sqlite", Dsn: "memory"})
+	repo.Init(ctx, &repo.Config{Driver: "sqlite", Dsn: "file::memory:"})
 
 	c, err := AddCertificate(ctx, pemToCer(testCerPEM))
 	if err != nil {

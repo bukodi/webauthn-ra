@@ -19,7 +19,7 @@ type entryWrapper[E SetEntry] struct {
 
 type Set[E SetEntry] struct {
 	masterHash [32]byte
-	fnSave     func(id [32]byte, prevId [32]byte, txId [32]byte, entry E) error
+	fnSave     func(id [32]byte, prevId [32]byte, txId [32]byte, entry E) (err error)
 	fnLoad     func(id [32]byte, entry E) (prevId [32]byte, txId [32]byte, err error)
 }
 
@@ -40,8 +40,10 @@ func NewSet[E SetEntry]() *Set[E] {
 			entriesById[prevId] = prev
 		}
 		if !isNil(id) {
-			if _, ok := entriesById[id]; ok {
-				return fmt.Errorf("already added")
+			if existingEntry, ok := entriesById[id]; ok {
+				if !isNil(existingEntry.id) {
+					return fmt.Errorf("already added")
+				}
 			}
 			entriesById[id] = entryWrapper[E]{entry, id, prevId, txId}
 		}

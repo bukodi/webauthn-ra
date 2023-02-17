@@ -17,8 +17,7 @@ type entryWrapper[E SetEntry] struct {
 }
 
 type Set[E SetEntry] struct {
-	masterHash Id
-	perister   Persister[E]
+	perister Persister[E]
 }
 
 func NewInMemorySet[E SetEntry]() *Set[E] {
@@ -28,7 +27,7 @@ func NewInMemorySet[E SetEntry]() *Set[E] {
 }
 
 func (vs *Set[E]) MasterHash() Id {
-	return vs.masterHash
+	return vs.perister.MasterHash()
 }
 func (vs *Set[E]) Get(id Id, entry E) error {
 	_, _, err := vs.perister.Load(id, entry)
@@ -43,7 +42,10 @@ func (vs *Set[E]) Delete(id Id) error {
 	if err := vs.perister.Save(nilId, id, nilId, dummy); err != nil {
 		return err
 	}
-	vs.masterHash = Xor(vs.masterHash, id)
+	actualMasterHash := vs.perister.MasterHash()
+	if err := vs.perister.UpdateMasterHash(Xor(actualMasterHash, id), actualMasterHash); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -56,7 +58,10 @@ func (vs *Set[E]) Add(entry E) (Id, error) {
 	if err := vs.perister.Save(id, nilId, nilId, entry); err != nil {
 		return nilId, err
 	}
-	vs.masterHash = Xor(vs.masterHash, id)
+	actualMasterHash := vs.perister.MasterHash()
+	if err := vs.perister.UpdateMasterHash(Xor(actualMasterHash, id), actualMasterHash); err != nil {
+		return nilId, err
+	}
 	return id, nil
 }
 
@@ -69,6 +74,9 @@ func (vs *Set[E]) Update(prevId Id, entry E) (Id, error) {
 	if err := vs.perister.Save(id, prevId, nilId, entry); err != nil {
 		return nilId, err
 	}
-	vs.masterHash = Xor(vs.masterHash, prevId, id)
+	actualMasterHash := vs.perister.MasterHash()
+	if err := vs.perister.UpdateMasterHash(Xor(actualMasterHash, id), actualMasterHash); err != nil {
+		return nilId, err
+	}
 	return id, nil
 }

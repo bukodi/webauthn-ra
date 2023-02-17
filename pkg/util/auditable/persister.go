@@ -2,17 +2,34 @@ package auditable
 
 import "fmt"
 
+var ErrMasherHashChanged = fmt.Errorf("master hash changed")
+
 type Persister[E SetEntry] interface {
+	MasterHash() Id
+	UpdateMasterHash(nextMasterHash Id, actualMasterHash Id) error
 	// Save the entry to the database
 	Save(id Id, prevId Id, txId [32]byte, entry E) (err error)
 	Load(id Id, entry E) (prevId Id, txId [32]byte, err error)
 }
 
 type inMemoryPersister[E SetEntry] struct {
+	masterHash  Id
 	entriesById map[Id]entryWrapper[E]
 }
 
 var _ Persister[SetEntry] = (*inMemoryPersister[SetEntry])(nil)
+
+func (imp *inMemoryPersister[E]) MasterHash() Id {
+	return imp.masterHash
+}
+
+func (imp *inMemoryPersister[E]) UpdateMasterHash(nextMasterHash Id, actualMasterHash Id) error {
+	if imp.masterHash != actualMasterHash {
+		return ErrMasherHashChanged
+	}
+	imp.masterHash = nextMasterHash
+	return nil
+}
 
 func (imp *inMemoryPersister[E]) Save(id Id, prevId Id, txId [32]byte, entry E) (err error) {
 	if !isNil(prevId) {

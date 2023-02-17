@@ -11,18 +11,12 @@ type testEntry struct {
 	Value string
 }
 
-var _ MapEntry = &testEntry{}
-
 func (t *testEntry) Marshal() ([]byte, error) {
 	return json.Marshal(t)
 }
 
 func (t *testEntry) Unmarshal(bytes []byte) error {
 	return json.Unmarshal(bytes, &t)
-}
-
-func (t *testEntry) KeyAsBytes() []byte {
-	return []byte(t.Key)
 }
 
 func newTestEntry(key, value string) *testEntry {
@@ -48,42 +42,8 @@ func TestMarshal(t *testing.T) {
 
 }
 
-func TestMap(t *testing.T) {
-	vs := NewMap[*testEntry]()
-	t.Logf("mh = %02x, empty set", vs.MasterHash())
-
-	id1, _ := vs.Add(newTestEntry("key1", "value1"))
-	t.Logf("mh = %02x, te1 added", vs.MasterHash())
-	_ = vs.DeleteByKeyHash(id1)
-	t.Logf("mh = %02x, te1 deleted by hash", vs.MasterHash())
-
-	te1 := newTestEntry("key1", "value1")
-	_, _ = vs.Add(te1)
-	t.Logf("mh = %02x, te1 added", vs.MasterHash())
-	_ = vs.Delete(te1)
-	t.Logf("mh = %02x, te1 deleted", vs.MasterHash())
-
-	id2, _ := vs.Add(newTestEntry("key2", "value2"))
-	t.Logf("mh = %02x, te2 added", vs.MasterHash())
-
-	te2 := newTestEntry("k0", "v0")
-	_ = vs.GetByKeyHash(id2, te2)
-	t.Logf("get te2 : %+v", te2)
-
-	_, _ = vs.Add(newTestEntry("key3", "value3"))
-	t.Logf("mh = %02x, te3 added", vs.MasterHash())
-
-	te2.Value = "value2_modified"
-	_, _ = vs.Update(te2)
-	t.Logf("mh = %02x, te2 modified", vs.MasterHash())
-
-	te2.Value = "value2"
-	_, _ = vs.Update(te2)
-	t.Logf("mh = %02x, te2 modified_back", vs.MasterHash())
-}
-
 func TestSet(t *testing.T) {
-	vs := NewSet[*testEntry]()
+	vs := NewInMemorySet[*testEntry]()
 	t.Logf("mh = %02x, empty set", vs.MasterHash())
 
 	id1, _ := vs.Add(newTestEntry("key1", "value1"))

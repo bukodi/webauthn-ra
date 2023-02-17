@@ -1,7 +1,7 @@
 package auditable
 
-func Xor(as ...[32]byte) [32]byte {
-	var m [32]byte
+func Xor(as ...Id) Id {
+	var m Id
 	for _, a := range as {
 		for i := range a {
 			m[i] = m[i] ^ a[i]
@@ -10,8 +10,10 @@ func Xor(as ...[32]byte) [32]byte {
 	return m
 }
 
-var nilId = [32]byte{}
+type Id [32]byte
 
-func isNil(id [32]byte) bool {
+var nilId Id = [32]byte{}
+
+func isNil(id Id) bool {
 	return id == nilId
 }

@@ -1,6 +1,7 @@
 package auditable
 
 import (
+	"context"
 	"crypto/sha256"
 )
 
@@ -18,6 +19,21 @@ type entryWrapper[E SetEntry] struct {
 
 type Set[E SetEntry] struct {
 	perister Persister[E]
+}
+
+type Tx[E SetEntry] struct {
+	set              *Set[E]
+	ctx              context.Context
+	actualMasterHash Id
+}
+
+func (vs *Set[E]) BeginTx(ctx context.Context) *Tx[E] {
+	tx := Tx[E]{
+		set:              vs,
+		ctx:              ctx,
+		actualMasterHash: vs.perister.MasterHash(),
+	}
+	return &tx
 }
 
 func NewInMemorySet[E SetEntry]() *Set[E] {

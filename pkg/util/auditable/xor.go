@@ -12,8 +12,8 @@ func Xor(as ...Id) Id {
 
 type Id [32]byte
 
-var nilId Id = [32]byte{}
+var NilId Id = [32]byte{}
 
-func isNil(id Id) bool {
-	return id == nilId
+func IsNil(id Id) bool {
+	return id == NilId
 }

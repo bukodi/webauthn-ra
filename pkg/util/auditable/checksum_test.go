@@ -1,8 +1,9 @@
-package auditable
+package auditable_test
 
 import (
 	"crypto/sha256"
 	"encoding/json"
+	"github.com/bukodi/webauthn-ra/pkg/util/auditable"
 	"testing"
 )
 
@@ -43,7 +44,7 @@ func TestMarshal(t *testing.T) {
 }
 
 func TestSet(t *testing.T) {
-	vs := NewInMemorySet[*testEntry]()
+	vs := auditable.NewSet[*testEntry](NewInMemoryPersister[*testEntry]())
 	t.Logf("mh = %02x, empty set", vs.MasterHash())
 
 	id1, _ := vs.Add(newTestEntry("key1", "value1"))
@@ -78,10 +79,10 @@ func TestSet(t *testing.T) {
 
 func TestNilId(t *testing.T) {
 	nilId := [32]byte{}
-	t.Logf("nilId = %02x", nilId)
+	t.Logf("NilId = %02x", nilId)
 	aId := sha256.Sum256([]byte("a"))
-	t.Logf("aId == nilId: %t", aId == nilId)
+	t.Logf("aId == NilId: %t", aId == nilId)
 	bId := [32]byte{}
-	t.Logf("bId == nilId: %t", bId == nilId)
+	t.Logf("bId == NilId: %t", bId == nilId)
 	t.Logf("aId == bId: %t", aId == bId)
 }

@@ -39,8 +39,8 @@ func TestAuditable(t *testing.T) {
 
 }
 
-type hashedEntry[E auditable.SetEntry] interface {
-	Entry() E
+type hashedEntry interface {
+	Entry() auditable.SetEntry
 	Hash() string
 }
 
@@ -57,8 +57,6 @@ func (w WrappedCfgEntry) Hash() string {
 	//TODO implement me
 	panic("implement me")
 }
-
-var _ hashedEntry[CfgEntry] = (*WrappedCfgEntry)(nil)
 
 type CfgEntry struct {
 	Key   string

@@ -5,18 +5,18 @@ import (
 	"github.com/bukodi/webauthn-ra/pkg/util/auditable"
 )
 
-type inMemoryPersister[E auditable.SetEntry] struct {
+type inMemoryPersister struct {
 	masterHash  auditable.Id
-	entriesById map[auditable.Id]entryWrapper[E]
+	entriesById map[auditable.Id]entryWrapper
 }
 
-var _ auditable.Persister[auditable.SetEntry] = (*inMemoryPersister[auditable.SetEntry])(nil)
+var _ auditable.Persister = (*inMemoryPersister)(nil)
 
-func (imp *inMemoryPersister[E]) MasterHash() auditable.Id {
+func (imp *inMemoryPersister) MasterHash() auditable.Id {
 	return imp.masterHash
 }
 
-func (imp *inMemoryPersister[E]) UpdateMasterHash(nextMasterHash auditable.Id, actualMasterHash auditable.Id) error {
+func (imp *inMemoryPersister) UpdateMasterHash(nextMasterHash auditable.Id, actualMasterHash auditable.Id) error {
 	if imp.masterHash != actualMasterHash {
 		return auditable.ErrMasherHashChanged
 	}
@@ -24,7 +24,7 @@ func (imp *inMemoryPersister[E]) UpdateMasterHash(nextMasterHash auditable.Id, a
 	return nil
 }
 
-func (imp *inMemoryPersister[E]) Save(id auditable.Id, prevId auditable.Id, txId [32]byte, entry E) (err error) {
+func (imp *inMemoryPersister) Save(id auditable.Id, prevId auditable.Id, txId [32]byte, entry auditable.SetEntry) (err error) {
 	if !auditable.IsNil(prevId) {
 		prev, ok := imp.entriesById[prevId]
 		if !ok {
@@ -43,12 +43,12 @@ func (imp *inMemoryPersister[E]) Save(id auditable.Id, prevId auditable.Id, txId
 				return fmt.Errorf("already added")
 			}
 		}
-		imp.entriesById[id] = entryWrapper[E]{entry, id, prevId, txId}
+		imp.entriesById[id] = entryWrapper{entry, id, prevId, txId}
 	}
 	return nil
 }
 
-func (imp *inMemoryPersister[E]) Load(id auditable.Id, entry E) (prevId auditable.Id, txId [32]byte, err error) {
+func (imp *inMemoryPersister) Load(id auditable.Id, entry auditable.SetEntry) (prevId auditable.Id, txId [32]byte, err error) {
 	wrapper, ok := imp.entriesById[id]
 	if !ok {
 		return auditable.NilId, auditable.NilId, fmt.Errorf("not found")
@@ -68,33 +68,33 @@ func (imp *inMemoryPersister[E]) Load(id auditable.Id, entry E) (prevId auditabl
 	return
 }
 
-func NewInMemoryPersister[E auditable.SetEntry]() (i *inMemoryPersister[E]) {
-	imp := inMemoryPersister[E]{}
-	imp.entriesById = make(map[auditable.Id]entryWrapper[E], 0)
+func NewInMemoryPersister() (i *inMemoryPersister) {
+	imp := inMemoryPersister{}
+	imp.entriesById = make(map[auditable.Id]entryWrapper, 0)
 	return &imp
 }
 
-type entryWrapper[E auditable.SetEntry] struct {
-	entry  E
+type entryWrapper struct {
+	entry  auditable.SetEntry
 	id     auditable.Id
 	prevId auditable.Id
 	txId   [32]byte
 }
 
-var _ auditable.EntryWrapper[auditable.SetEntry] = (*entryWrapper[auditable.SetEntry])(nil)
+var _ auditable.EntryWrapper = (*entryWrapper)(nil)
 
-func (e entryWrapper[E]) Entry() E {
+func (e entryWrapper) Entry() auditable.SetEntry {
 	return e.entry
 }
 
-func (e entryWrapper[E]) Id() auditable.Id {
+func (e entryWrapper) Id() auditable.Id {
 	return e.id
 }
 
-func (e entryWrapper[E]) PrevId() auditable.Id {
+func (e entryWrapper) PrevId() auditable.Id {
 	return e.prevId
 }
 
-func (e entryWrapper[E]) TxId() [32]byte {
+func (e entryWrapper) TxId() [32]byte {
 	return e.txId
 }

@@ -1,6 +1,7 @@
 package auditable_test
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/json"
 	"github.com/bukodi/webauthn-ra/pkg/util/auditable"
@@ -44,15 +45,17 @@ func TestMarshal(t *testing.T) {
 }
 
 func TestSet(t *testing.T) {
-	vs := auditable.NewSet[*testEntry](NewInMemoryPersister[*testEntry]())
+	vs := auditable.NewSet(NewInMemoryPersister())
 	t.Logf("mh = %02x, empty set", vs.MasterHash())
 
-	id1, _ := vs.Add(newTestEntry("key1", "value1"))
+	tx := vs.BeginTx(context.TODO())
+	id1, _ := tx.Add(newTestEntry("key1", "value1"))
 	t.Logf("mh = %02x, te1 added", vs.MasterHash())
-	_ = vs.Delete(id1)
+
+	_ = tx.Delete(id1)
 	t.Logf("mh = %02x, te1 deleted by hash", vs.MasterHash())
 
-	id2, _ := vs.Add(newTestEntry("key2", "value2"))
+	id2, _ := tx.Add(newTestEntry("key2", "value2"))
 	t.Logf("mh = %02x, te2 added", vs.MasterHash())
 
 	te2 := newTestEntry("k0", "v0")
@@ -63,11 +66,11 @@ func TestSet(t *testing.T) {
 	//	t.Logf("mh = %02x, te3 added", vs.MasterHash())
 
 	te2.Value = "value2_modified"
-	id2m, _ := vs.Update(id2, te2)
+	id2m, _ := tx.Update(id2, te2)
 	t.Logf("mh = %02x, te2 modified", vs.MasterHash())
 
 	te2.Value = "value2"
-	id2mb, _ := vs.Update(id2m, te2)
+	id2mb, _ := tx.Update(id2m, te2)
 	t.Logf("mh = %02x, te2 modified_back", vs.MasterHash())
 	t.Logf("")
 

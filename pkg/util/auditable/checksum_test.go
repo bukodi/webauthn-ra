@@ -28,6 +28,10 @@ func newTestEntry(key, value string) *testEntry {
 	}
 }
 
+func TestUlid(t *testing.T) {
+
+}
+
 func TestMarshal(t *testing.T) {
 	te := newTestEntry("key1", "value1")
 	bytes, err := te.Marshal()

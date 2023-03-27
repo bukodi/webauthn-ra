@@ -10,6 +10,16 @@ type inMemoryPersister struct {
 	entriesById map[auditable.Id]entryWrapper
 }
 
+func (imp *inMemoryPersister) LastTxId() (txId [32]byte, err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (imp *inMemoryPersister) SaveTx(tx auditable.TxToSave) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 var _ auditable.Persister = (*inMemoryPersister)(nil)
 
 func (imp *inMemoryPersister) MasterHash() auditable.Id {

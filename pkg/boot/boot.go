@@ -2,8 +2,8 @@ package boot
 
 import (
 	"context"
+	"github.com/bukodi/webauthn-ra/pkg/boot/bootparams"
 	"github.com/bukodi/webauthn-ra/pkg/certs"
-	"github.com/bukodi/webauthn-ra/pkg/config"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/bukodi/webauthn-ra/pkg/listeners"
 	"github.com/bukodi/webauthn-ra/pkg/openapi"
@@ -21,11 +21,11 @@ func Boot(ctx context.Context) error {
 		ctx = context.Background()
 	}
 
-	if err := config.LoadFromFile(""); err != nil {
+	if err := bootparams.LoadFromFile(""); err != nil {
 		return errlog.Handle(ctx, err)
 	}
 	var dbOpts repo.Config
-	if err := config.InitStruct(cfgPathDatabase, &dbOpts); err != nil {
+	if err := bootparams.InitStruct(cfgPathDatabase, &dbOpts); err != nil {
 		return errlog.Handle(ctx, err)
 	}
 	if err = repo.Init(ctx, &dbOpts); err != nil {
@@ -33,7 +33,7 @@ func Boot(ctx context.Context) error {
 	}
 
 	var certsOpts certs.Config
-	if err := config.InitStruct("certs", &certsOpts); err != nil {
+	if err := bootparams.InitStruct("certs", &certsOpts); err != nil {
 		return errlog.Handle(ctx, err)
 	}
 	if err = certs.Init(ctx, &certsOpts); err != nil {
@@ -41,7 +41,7 @@ func Boot(ctx context.Context) error {
 	}
 
 	var webauthnOpts webauthn.Config
-	if err := config.InitStruct("webauthn", &webauthnOpts); err != nil {
+	if err := bootparams.InitStruct("webauthn", &webauthnOpts); err != nil {
 		return errlog.Handle(ctx, err)
 	}
 	if err = webauthn.Init(ctx, &webauthnOpts); err != nil {
@@ -49,7 +49,7 @@ func Boot(ctx context.Context) error {
 	}
 
 	listenersCfg := make([]map[string]interface{}, 0)
-	config.InitStruct(cfgPathListeners, &listenersCfg)
+	bootparams.InitStruct(cfgPathListeners, &listenersCfg)
 
 	srv, err := listeners.NewHttpServer(":3000")
 	if err != nil {

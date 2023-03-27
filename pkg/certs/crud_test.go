@@ -4,13 +4,13 @@ import (
 	"context"
 	"crypto/x509"
 	"encoding/pem"
-	"github.com/bukodi/webauthn-ra/pkg/config"
+	"github.com/bukodi/webauthn-ra/pkg/bootparams"
 	"github.com/bukodi/webauthn-ra/pkg/repo"
 	"testing"
 )
 
 func init() {
-	config.LoadFromJson(`{
+	bootparams.LoadFromJson(`{
   "database": {
     "driver": "sqlite",
     "dsn": "file::memory:"

@@ -1,4 +1,4 @@
-package config
+package bootparams
 
 import (
 	_ "embed"
@@ -21,7 +21,7 @@ var DefaultJSON string
 func LoadFromFile(filePath string) error {
 	if filePath != "" {
 		if err := k.Load(file.Provider(filePath), json.Parser()); err != nil {
-			return fmt.Errorf("error loading %s config file: %v", filePath, err)
+			return fmt.Errorf("error loading %s bootparams file: %v", filePath, err)
 		}
 	} else if DefaultJSON != "" {
 		if err := k.Load(rawbytes.Provider([]byte(DefaultJSON)), json.Parser()); err != nil {

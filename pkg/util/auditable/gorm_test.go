@@ -58,6 +58,14 @@ func (w WrappedCfgEntry) Hash() string {
 	panic("implement me")
 }
 
+type Auditable struct {
+}
+
+type Descriptor struct {
+	Key   string
+	Value string
+}
+
 type CfgEntry struct {
 	Key   string
 	Value string

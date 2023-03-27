@@ -18,7 +18,7 @@ func NewAuthenticatorModel(ctx context.Context, obj *model.AuthenticatorModel) e
 
 func Create[R model.Record](ctx context.Context, r R) error {
 	var signer crypto.Signer
-	err := ExecuteInWriteTx(ctx, signer, func(ctx context.Context) error {
+	err := NewWriteTx(ctx, signer, func(ctx context.Context) error {
 		if r.Id() == "" {
 			if iag, ok := any(r).(model.IdAutoGenerator); ok {
 				id, err := ulid.New(uint64(time.Now().UnixMilli()), rand.Reader)

@@ -1,4 +1,4 @@
-package config
+package bootparams
 
 import "testing"
 

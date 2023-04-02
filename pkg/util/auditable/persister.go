@@ -5,8 +5,8 @@ import "fmt"
 var ErrMasherHashChanged = fmt.Errorf("master hash changed")
 
 type TxToSave interface {
-	Id() [32]byte
-	PrevTxId() [32]byte
+	Id() TxId
+	PrevTxId() TxId
 	Changes() []EntryChange
 	Signature() []byte
 }
@@ -26,8 +26,9 @@ type EntryChange interface {
 
 type Persister interface {
 	MasterHash() Id
-	LastTxId() (txId [32]byte, err error)
+	LastTxId() (txId TxId, err error)
 	SaveTx(tx TxToSave) error
+	LoadTx(txId TxId) (tx TxToSave, err error)
 	UpdateMasterHash(nextMasterHash Id, actualMasterHash Id) error
 	// Save the entry to the database
 	Save(id Id, prevId Id, txId [32]byte, entry SetEntry) (err error)

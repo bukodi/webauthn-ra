@@ -37,7 +37,8 @@ Transaction log, with signer info
 Cumulative state hash
 Time machine function
 No anonymization support
-Rollback on concurrent modification
+Concurrent modification isn't permitted
+Can't reference to other domain
 
 ### Generic data
 Multiple version of a record

@@ -1,5 +1,7 @@
 package auditable
 
+import "github.com/oklog/ulid/v2"
+
 func Xor(as ...Id) Id {
 	var m Id
 	for _, a := range as {
@@ -17,3 +19,5 @@ var NilId Id = [32]byte{}
 func IsNil(id Id) bool {
 	return id == NilId
 }
+
+type TxId ulid.ULID

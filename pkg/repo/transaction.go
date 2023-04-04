@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"crypto"
 	"fmt"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"gorm.io/gorm"
@@ -14,10 +13,9 @@ const writeTxKey writeTxKeyType = 1
 
 type writeTx struct {
 	writeTx *gorm.DB
-	signer  crypto.Signer
 }
 
-func WriteTx(ctx context.Context, signer crypto.Signer, fn func(ctx context.Context) error) error {
+func WriteTx(ctx context.Context, fn func(ctx context.Context) error) error {
 	_, ok := ctx.Value(writeTxKey).(*writeTx)
 	if ok {
 		return errlog.Handle(ctx, fmt.Errorf("already in a write transaction"))
@@ -36,7 +34,6 @@ func WriteTx(ctx context.Context, signer crypto.Signer, fn func(ctx context.Cont
 
 	var writeTx = writeTx{
 		writeTx: dbTx,
-		signer:  signer,
 	}
 	ctx2 := context.WithValue(ctx, writeTxKey, &writeTx)
 	err := fn(ctx2)
@@ -48,7 +45,7 @@ func WriteTx(ctx context.Context, signer crypto.Signer, fn func(ctx context.Cont
 	}
 }
 
-func NewWriteTx(ctx context.Context, signer crypto.Signer, fn func(ctx context.Context) error) error {
+func NewWriteTx(ctx context.Context, fn func(ctx context.Context) error) error {
 	_, ok := ctx.Value(writeTxKey).(*writeTx)
 	if ok {
 		return errlog.Handle(ctx, fmt.Errorf("already in a write transaction"))
@@ -67,7 +64,6 @@ func NewWriteTx(ctx context.Context, signer crypto.Signer, fn func(ctx context.C
 
 	var writeTx = writeTx{
 		writeTx: dbTx,
-		signer:  signer,
 	}
 	ctx2 := context.WithValue(ctx, writeTxKey, &writeTx)
 	err := fn(ctx2)

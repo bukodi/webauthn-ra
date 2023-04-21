@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"encoding/pem"
-	"github.com/bukodi/webauthn-ra/pkg/bootparams"
+	"github.com/bukodi/webauthn-ra/pkg/boot/bootparams"
 	"github.com/bukodi/webauthn-ra/pkg/repo"
 	"testing"
 )

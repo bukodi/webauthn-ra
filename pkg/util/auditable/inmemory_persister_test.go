@@ -10,7 +10,12 @@ type inMemoryPersister struct {
 	entriesById map[auditable.Id]entryWrapper
 }
 
-func (imp *inMemoryPersister) LastTxId() (txId [32]byte, err error) {
+func (imp *inMemoryPersister) LastTxId() (txId auditable.TxId, err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (imp *inMemoryPersister) LoadTx(txId auditable.TxId) (tx auditable.TxToSave, err error) {
 	//TODO implement me
 	panic("implement me")
 }

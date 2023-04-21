@@ -9,6 +9,13 @@ import (
 	"testing"
 )
 
+func TestAuditable(t *testing.T) {
+	db := openTestDb(t)
+	registerType[auditable.TxToSave](t, db)
+	registerType[CfgEntry](t, db)
+
+}
+
 func openTestDb(t *testing.T) *gorm.DB {
 	var dialector gorm.Dialector
 	var gormCfg = gorm.Config{
@@ -30,13 +37,6 @@ func registerType[R any](t *testing.T, db *gorm.DB) {
 	if err != nil {
 		t.Fatal(err)
 	}
-}
-
-func TestAuditable(t *testing.T) {
-	db := openTestDb(t)
-	registerType[CfgEntry](t, db)
-	registerType[WrappedCfgEntry](t, db)
-
 }
 
 type hashedEntry interface {

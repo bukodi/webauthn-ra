@@ -3,6 +3,7 @@ module github.com/bukodi/webauthn-ra
 go 1.20
 
 require (
+	github.com/bukodi/go-pkcs12 v0.0.0-20230406152834-f6d22e645fe1
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/swaggest/rest v0.2.18
 	github.com/swaggest/swgui v1.4.3

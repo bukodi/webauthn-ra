@@ -4,13 +4,12 @@ import (
 	"context"
 	"crypto/x509"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
-	"github.com/bukodi/webauthn-ra/pkg/model"
-	"github.com/bukodi/webauthn-ra/pkg/repo"
+	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
 	"github.com/bukodi/webauthn-ra/pkg/util"
 	"time"
 )
 
-var _ model.Record = &StoredCert{}
+var _ repo.Record = &StoredCert{}
 
 type StoredCert struct {
 	ThumbprintSHA256 string `gorm:"primary_key"` // SHA256 hash of the DER encoded certificate

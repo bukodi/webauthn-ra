@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/bukodi/webauthn-ra/pkg/model"
+	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
 	"time"
 )
 
@@ -21,4 +21,4 @@ func (c *ChangeTx) IdFieldName() string {
 	return "TxId"
 }
 
-var _ model.Record = (*ChangeTx)(nil)
+var _ repo.Record = (*ChangeTx)(nil)

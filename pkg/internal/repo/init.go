@@ -3,7 +3,6 @@ package repo
 import (
 	"context"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
-	"github.com/bukodi/webauthn-ra/pkg/model"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -11,6 +10,7 @@ import (
 type Config struct {
 	Driver string
 	Dsn    string
+	Debug  bool
 	// credential
 }
 
@@ -32,12 +32,15 @@ func Init(ctx context.Context, cfg *Config) error {
 	if err != nil {
 		return errlog.Handle(ctx, err)
 	}
+	if cfg.Debug {
+		db = db.Debug()
+	}
 	dbInstance = db
 
 	return nil
 }
 
-func RegisterType[R model.Record]() error {
+func RegisterType[R Record]() error {
 	var r R
 	err := dbInstance.AutoMigrate(&r)
 	return errlog.Handle(nil, err)

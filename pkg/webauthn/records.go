@@ -1,11 +1,11 @@
 package webauthn
 
 import (
-	"github.com/bukodi/webauthn-ra/pkg/model"
+	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
 	"time"
 )
 
-var _ model.Record = &Authenticator{}
+var _ repo.Record = &Authenticator{}
 
 type Authenticator struct {
 	RegistrationID            string    `gorm:"primary_key"` // base64url encoded ID returned from client

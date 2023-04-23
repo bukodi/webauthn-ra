@@ -5,9 +5,9 @@ import (
 	"github.com/bukodi/webauthn-ra/pkg/boot/bootparams"
 	"github.com/bukodi/webauthn-ra/pkg/certs"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
+	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
 	"github.com/bukodi/webauthn-ra/pkg/listeners"
 	"github.com/bukodi/webauthn-ra/pkg/openapi"
-	"github.com/bukodi/webauthn-ra/pkg/repo"
 	"github.com/bukodi/webauthn-ra/pkg/webauthn"
 )
 

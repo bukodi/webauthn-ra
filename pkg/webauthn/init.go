@@ -3,8 +3,8 @@ package webauthn
 import (
 	"context"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
+	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
 	"github.com/bukodi/webauthn-ra/pkg/model"
-	"github.com/bukodi/webauthn-ra/pkg/repo"
 	"time"
 )
 

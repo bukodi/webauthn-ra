@@ -22,6 +22,7 @@ func StateById(ctx context.Context, statedId StateId) (State, error) {
 }
 
 func LatestState(ctx context.Context) (State, error) {
+
 	return nil, nil
 }
 

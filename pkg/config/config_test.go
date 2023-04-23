@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/bukodi/webauthn-ra/pkg/config"
-	"github.com/bukodi/webauthn-ra/pkg/repo"
+	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
 	"github.com/bukodi/webauthn-ra/pkg/util/auditable"
 	"strings"
 	"testing"
@@ -15,9 +15,12 @@ func TestInit(t *testing.T) {
 	if err := repo.Init(context.TODO(), &repo.Config{
 		Driver: "sqlite",
 		Dsn:    ":memory:",
+		Debug:  true,
 	}); err != nil {
 		t.Fatalf("%+v", err)
 	}
+
+	config.Init(context.TODO(), &config.Options{})
 
 	if err := config.RegisterType[*CfgEntry](); err != nil {
 		t.Fatalf("%+v", err)

@@ -2,9 +2,10 @@ package model
 
 import (
 	"encoding/json"
+	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
 )
 
-var _ Record = &Challenge{}
+var _ repo.Record = &Challenge{}
 
 type Challenge struct {
 	Hash    string `gorm:"primary_key;column:id"` // base64url encoded SHA256 hash of the RawData

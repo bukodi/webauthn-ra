@@ -2,25 +2,18 @@ package repo
 
 import (
 	"context"
-	"crypto"
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
-	"github.com/bukodi/webauthn-ra/pkg/model"
 	"github.com/oklog/ulid/v2"
 	"time"
 )
 
-func NewAuthenticatorModel(ctx context.Context, obj *model.AuthenticatorModel) error {
-	return nil
-}
-
-func Create[R model.Record](ctx context.Context, r R) error {
-	var signer crypto.Signer
-	err := NewWriteTx(ctx, signer, func(ctx context.Context) error {
+func Create[R Record](ctx context.Context, r R) error {
+	err := NewWriteTx(ctx, func(ctx context.Context) error {
 		if r.Id() == "" {
-			if iag, ok := any(r).(model.IdAutoGenerator); ok {
+			if iag, ok := any(r).(IdAutoGenerator); ok {
 				id, err := ulid.New(uint64(time.Now().UnixMilli()), rand.Reader)
 				if err != nil {
 					return errlog.Handle(ctx, err)
@@ -49,7 +42,7 @@ func Create[R model.Record](ctx context.Context, r R) error {
 	return errlog.Handle(ctx, err)
 }
 
-func FindById[R model.Record](ctx context.Context, obj R, id string) error {
+func FindById[R Record](ctx context.Context, obj R, id string) error {
 	tx := dbInstance.First(obj, "id = ?", id)
 	if tx.Error != nil {
 		return errlog.Handle(ctx, tx.Error)

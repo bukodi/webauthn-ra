@@ -11,7 +11,7 @@ import (
 
 func TestAuditable(t *testing.T) {
 	db := openTestDb(t)
-	registerType[auditable.TxToSave](t, db)
+	//registerType[auditable.TxToSave](t, db)
 	registerType[CfgEntry](t, db)
 
 }

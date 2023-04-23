@@ -3,7 +3,7 @@ package certs
 import (
 	"context"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
-	"github.com/bukodi/webauthn-ra/pkg/repo"
+	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
 )
 
 type Config struct {

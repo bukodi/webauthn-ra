@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
-	"github.com/bukodi/webauthn-ra/pkg/model"
-	"github.com/bukodi/webauthn-ra/pkg/repo"
+	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
 	"sync"
 )
 
@@ -21,7 +20,7 @@ func Init(ctx context.Context, opts *Options) error {
 
 var configTypes = sync.Map{}
 
-func RegisterType[R model.Record]() error {
+func RegisterType[R repo.Record]() error {
 	if err := repo.RegisterType[R](); err != nil {
 		return errlog.Handle(context.TODO(), err)
 	}
@@ -30,7 +29,7 @@ func RegisterType[R model.Record]() error {
 	typeName := fmt.Sprintf("%T", r)
 
 	// TODO: this is not atomic, use CompareAndSwap
-	if _, found := configTypes.Load(typeName); found {
+	if _, swapped := configTypes.Swap(typeName, typeName); swapped {
 		return errlog.Handle(context.TODO(), fmt.Errorf("config type already registered: %s", typeName))
 	} else {
 		configTypes.Store(typeName, typeName)

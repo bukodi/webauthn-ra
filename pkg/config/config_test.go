@@ -20,7 +20,9 @@ func TestInit(t *testing.T) {
 		t.Fatalf("%+v", err)
 	}
 
-	config.Init(context.TODO(), &config.Options{})
+	if err := config.Init(context.TODO(), &config.Options{}); err != nil {
+		t.Fatalf("%+v", err)
+	}
 
 	if err := config.RegisterType[*CfgEntry](); err != nil {
 		t.Fatalf("%+v", err)

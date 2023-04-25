@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"github.com/bukodi/webauthn-ra/pkg/config/internal/cfginternal"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
 	"sync"
@@ -12,7 +13,10 @@ type Options struct {
 }
 
 func Init(ctx context.Context, opts *Options) error {
-	if err := repo.RegisterType[*ChangeTx](); err != nil {
+	if err := repo.RegisterType[*cfginternal.ChangeTx](); err != nil {
+		return errlog.Handle(ctx, err)
+	}
+	if err := repo.RegisterType[*cfginternal.LatestConfig](); err != nil {
 		return errlog.Handle(ctx, err)
 	}
 	return nil
@@ -28,7 +32,6 @@ func RegisterType[R repo.Record]() error {
 	var r R
 	typeName := fmt.Sprintf("%T", r)
 
-	// TODO: this is not atomic, use CompareAndSwap
 	if _, swapped := configTypes.Swap(typeName, typeName); swapped {
 		return errlog.Handle(context.TODO(), fmt.Errorf("config type already registered: %s", typeName))
 	} else {

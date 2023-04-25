@@ -15,6 +15,15 @@ type writeTx struct {
 	writeTx *gorm.DB
 }
 
+type ReadCtx struct {
+	context.Context
+	db *gorm.DB
+}
+
+type WriteCtx struct {
+	ReadCtx
+}
+
 func WriteTx(ctx context.Context, fn func(ctx context.Context) error) error {
 	_, ok := ctx.Value(writeTxKey).(*writeTx)
 	if ok {

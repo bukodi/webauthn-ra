@@ -1,4 +1,4 @@
-package config
+package cfginternal
 
 import (
 	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
@@ -6,9 +6,9 @@ import (
 )
 
 type ChangeTx struct {
-	TxId      StateId
-	PrevTx    StateId
-	NextTx    StateId
+	TxId      string
+	PrevTx    string
+	NextTx    string
 	NotBefore time.Time
 	NotAfter  time.Time
 }

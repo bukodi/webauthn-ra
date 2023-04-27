@@ -7,9 +7,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type readTxKeyType int
 type writeTxKeyType int
 
-const writeTxKey writeTxKeyType = 1
+const readTxKey readTxKeyType = 1
+const writeTxKey writeTxKeyType = 2
 
 type writeTx struct {
 	writeTx *gorm.DB
@@ -24,7 +26,7 @@ type WriteCtx struct {
 	ReadCtx
 }
 
-func WriteTx(ctx context.Context, fn func(ctx context.Context) error) error {
+func WriteTx1(ctx context.Context, fn func(ctx context.Context) error) error {
 	_, ok := ctx.Value(writeTxKey).(*writeTx)
 	if ok {
 		return errlog.Handle(ctx, fmt.Errorf("already in a write transaction"))

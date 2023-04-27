@@ -1,4 +1,4 @@
-package cfginternal
+package cfggorm
 
 import (
 	"github.com/bukodi/webauthn-ra/pkg/internal/repo"

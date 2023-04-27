@@ -16,7 +16,7 @@ type Config struct {
 
 var dbInstance *gorm.DB
 
-func Init(ctx context.Context, cfg *Config) error {
+func OpenDB(cfg *Config) (*gorm.DB, error) {
 	var dialector gorm.Dialector
 	var gormCfg = gorm.Config{
 		SkipDefaultTransaction: true,
@@ -25,17 +25,25 @@ func Init(ctx context.Context, cfg *Config) error {
 	if cfg.Driver == "sqlite" {
 		dialector = sqlite.Open(cfg.Dsn)
 	} else {
-		return errlog.Handle(ctx, &ErrUnsupportedDriver{driver: cfg.Driver})
+		return nil, errlog.Handle(context.TODO(), &ErrUnsupportedDriver{driver: cfg.Driver})
 	}
 
 	db, err := gorm.Open(dialector, &gormCfg)
 	if err != nil {
-		return errlog.Handle(ctx, err)
+		return nil, errlog.Handle(context.TODO(), err)
 	}
 	if cfg.Debug {
 		db = db.Debug()
 	}
-	dbInstance = db
+	return db, nil
+}
+
+func Init(ctx context.Context, cfg *Config) error {
+	if db, err := OpenDB(cfg); err != nil {
+		return errlog.Handle(ctx, err)
+	} else {
+		dbInstance = db
+	}
 
 	return nil
 }

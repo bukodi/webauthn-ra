@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
-	"github.com/bukodi/webauthn-ra/pkg/config/internal/cfginternal"
+	"github.com/bukodi/webauthn-ra/pkg/config/internal/cfggorm"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
 	"sync"
@@ -13,10 +13,10 @@ type Options struct {
 }
 
 func Init(ctx context.Context, opts *Options) error {
-	if err := repo.RegisterType[*cfginternal.ChangeTx](); err != nil {
+	if err := repo.RegisterType[*cfggorm.ChangeTx](); err != nil {
 		return errlog.Handle(ctx, err)
 	}
-	if err := repo.RegisterType[*cfginternal.LatestConfig](); err != nil {
+	if err := repo.RegisterType[*cfggorm.LatestConfig](); err != nil {
 		return errlog.Handle(ctx, err)
 	}
 	return nil

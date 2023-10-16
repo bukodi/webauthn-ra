@@ -5,7 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"github.com/bukodi/webauthn-ra/pkg/boot/bootparams"
-	"github.com/bukodi/webauthn-ra/pkg/repo"
+	"github.com/bukodi/webauthn-ra/pkg/internal/repo"
 	"testing"
 )
 

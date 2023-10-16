@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/descope/virtualwebauthn v1.0.2
 	github.com/elgopher/yala v1.1.0
 	github.com/fxamacker/webauthn v0.6.1
 	github.com/knadh/koanf v1.5.0
@@ -35,7 +36,7 @@ require (
 	github.com/djherbis/times v1.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
-	github.com/fxamacker/cbor/v2 v2.2.0 // indirect
+	github.com/fxamacker/cbor/v2 v2.4.0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.4.0 // indirect
 	github.com/go-git/go-git/v5 v5.6.0 // indirect

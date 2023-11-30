@@ -9,43 +9,42 @@ import (
 	"github.com/bukodi/webauthn-ra/pkg/listeners"
 	"github.com/bukodi/webauthn-ra/pkg/openapi"
 	"github.com/bukodi/webauthn-ra/pkg/webauthn"
+	"log/slog"
 )
 
 const cfgPathDatabase = "database"
 const cfgPathListeners = "listeners"
 
-func Boot(ctx context.Context) error {
-	var err error
-
-	if ctx == nil {
-		ctx = context.Background()
+func Boot() (*Runtime, error) {
+	rt := &Runtime{
+		parent: context.Background(),
 	}
 
 	if err := bootparams.LoadFromFile(""); err != nil {
-		return errlog.Handle(ctx, err)
+		return nil, errlog.Handle(rt, err)
 	}
 	var dbOpts repo.Config
 	if err := bootparams.InitStruct(cfgPathDatabase, &dbOpts); err != nil {
-		return errlog.Handle(ctx, err)
+		return nil, errlog.Handle(rt, err)
 	}
-	if err = repo.Init(ctx, &dbOpts); err != nil {
-		return errlog.Handle(ctx, err)
+	if err := repo.Init(rt, &dbOpts); err != nil {
+		return nil, errlog.Handle(rt, err)
 	}
 
 	var certsOpts certs.Config
 	if err := bootparams.InitStruct("certs", &certsOpts); err != nil {
-		return errlog.Handle(ctx, err)
+		return nil, errlog.Handle(rt, err)
 	}
-	if err = certs.Init(ctx, &certsOpts); err != nil {
-		return errlog.Handle(ctx, err)
+	if err := certs.Init(rt, &certsOpts); err != nil {
+		return nil, errlog.Handle(rt, err)
 	}
 
 	var webauthnOpts webauthn.Config
 	if err := bootparams.InitStruct("webauthn", &webauthnOpts); err != nil {
-		return errlog.Handle(ctx, err)
+		return nil, errlog.Handle(rt, err)
 	}
-	if err = webauthn.Init(ctx, &webauthnOpts); err != nil {
-		return errlog.Handle(ctx, err)
+	if err := webauthn.Init(rt, &webauthnOpts); err != nil {
+		return nil, errlog.Handle(rt, err)
 	}
 
 	listenersCfg := make([]map[string]interface{}, 0)
@@ -53,21 +52,21 @@ func Boot(ctx context.Context) error {
 
 	srv, err := listeners.NewHttpServer(":3000")
 	if err != nil {
-		return errlog.Handle(ctx, err)
+		return nil, errlog.Handle(rt, err)
 	}
 
 	if httpFsHandler, err := listeners.UIStaticStaticHandler("/app/"); err != nil {
-		return errlog.Handle(ctx, err)
+		return rt, errlog.Handle(rt, err)
 	} else {
 		srv.Handle("/app/", httpFsHandler)
-		errlog.Infof(ctx, "UI accessible on  http://localhost:3000/app")
+		slog.InfoContext(rt, "UI accessible on  http://localhost:3000/app")
 	}
 
 	if apiHandler, err := openapi.ApiRouter("/api/v1"); err != nil {
-		return errlog.Handle(ctx, err)
+		return nil, errlog.Handle(rt, err)
 	} else {
 		srv.Handle("/", apiHandler)
-		errlog.Infof(ctx, "API accessible on  http://localhost:3000/api/v1/docs")
+		slog.InfoContext(rt, "API accessible on  http://localhost:3000/api/v1/docs")
 	}
 
 	/*
@@ -80,5 +79,5 @@ func Boot(ctx context.Context) error {
 		}))*/
 
 	srv.ListenAndServe()
-	return nil
+	return rt, nil
 }

@@ -8,7 +8,8 @@ import (
 )
 
 func TestBoot(t *testing.T) {
-	if err := Boot(context.Background()); err != nil {
+	rt, err := Boot()
+	if err != nil {
 		t.Fatal(err)
 	}
 
@@ -25,5 +26,6 @@ func TestBoot(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Logf("Obj: %+v", c2)
+	rt.StartServe()
 
 }

@@ -14,5 +14,5 @@ func TestUserCtx(t *testing.T) {
 	ctx := context.WithValue(context.Background(), reflect.TypeOf(uctx), uctx)
 	var uctx2 UserCtx
 	FromContext(ctx, &uctx2)
-	t.Log(uctx2)
+	t.Logf("user from context: %v", uctx2)
 }

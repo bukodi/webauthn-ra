@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/bukodi/webauthn-ra/pkg/errlog"
 	"github.com/oklog/ulid/v2"
+	"log/slog"
 	"time"
 )
 
@@ -25,7 +26,7 @@ func Create[R Record](ctx context.Context, r R) error {
 		}
 
 		jsonBytes, err := json.Marshal(r)
-		errlog.Debugf(ctx, "Json: %s", string(jsonBytes))
+		slog.DebugContext(ctx, fmt.Sprintf("Json: %s", string(jsonBytes)))
 
 		tx, err := RequiresWriteTx(ctx)
 		if err != nil {
